@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Service\Ldap;
 
 use Symfony\Component\Ldap\Entry;
@@ -84,7 +83,7 @@ class Client
      *
      * @throws LdapException When option given doesn't match a ldap entry
      *
-     * @psalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @$ldappsalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
      */
     public function executeQuery(string $query)
     {
@@ -104,10 +103,9 @@ class Client
         $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
 
         $entry = new Entry($fullDn, $attributes);
-        if (!empty($entryManager->add($entry))) {
-            return true;
-        }
-        return false;
+
+        // XXX Check if its possible to return the saved LDAP entry.
+        return !empty($entryManager->add($entry));
     }
 
     /**
@@ -119,6 +117,7 @@ class Client
     {
         $entryManager = $this->ldap->getEntryManager();
 
+        // TODO Replace query by fullDn.
         // Finding and updating an existing entry
         $result = $this->executeQuery($query);
 
@@ -128,10 +127,11 @@ class Client
         if (empty($entry)) {
             return false;
         }
-        
+
         foreach ($attributes as $key => $value) {
             $entry->setAttribute($key, $value);
         }
+        // XXX Check if its possible to return the saved LDAP entry.
         $entryManager->update($entry);
 
         return true;
