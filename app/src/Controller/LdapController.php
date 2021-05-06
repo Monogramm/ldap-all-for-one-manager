@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\Ldap\Client;
+use Error;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,16 +23,27 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
-        $query = json_decode($request->get('query', '()'), true);
+        //$query = json_decode($request->get('query', '{}'), true);
         // TODO Add order option.
         //$orders  = json_decode($request->get('orders', null), true);
         // TODO Serialize in base64 jpegPhoto.
         // TODO Add attributes option.
 
+        $query = $request->get('query', '()');
+        $attributes = $request->get('attributes', [""]);
+        
         $ldapEntries = $ldap->search($query);
 
-        $total = count($ldapEntries);
-        $entries = $serializer->serialize($ldapEntries, 'json');
+        foreach ($ldapEntries as $key => $entry) {
+            foreach ($attributes as $attr) {
+                $entries[$key][$attr] = ($entry->hasAttribute($attr) && !empty($entry->getAttribute($attr))) ?
+                    json_encode($entry->getAttribute($attr)) : "null";
+            }
+        }
+
+        $total = count($entries);
+
+        $entries = $serializer->serialize($entries, 'json');
 
         return new JsonResponse([
             'total' => $total,
@@ -81,22 +93,26 @@ class LdapController extends AbstractController
         );
 
         // TODO Deserialize from base64 jpegPhoto.
-
+       
         $result = $ldap->create($dto->getDn(), $dto->getAttributes());
         // TODO Check result.
+        if($result)
+        {
+            return JsonResponse::fromJsonString(
+                $serializer->serialize($dto, 'json')
+            );
+        }
 
-        return JsonResponse::fromJsonString(
-            $serializer->serialize($dto, 'json')
-        );
+        return new Error("Operation échouer");
     }
 
     /**
-     * @Route("/api/admin/ldap/{fullDn}", name="edit_ldap_entry", methods={"PUT"})
+     * @Route("/api/admin/ldap/{query}", name="edit_ldap_entry", methods={"PUT"})
      *
      * @return JsonResponse
      */
-    public function editLdapEntryById(
-        string $fullDn,
+    public function editLdapEntryByQuery(
+        string $query,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
@@ -109,17 +125,17 @@ class LdapController extends AbstractController
             Entry::class,
             'json'
         );
-
-        $query = "(dn=$fullDn)";
-
         // TODO Deserialize from base64 jpegPhoto.
 
-        $result = $ldap->update($query, $dto->getAttributes());
         // TODO Check result.
+        if($ldap->update("($query)", $dto->getAttributes()))
+        {
+            return JsonResponse::fromJsonString(
+                $serializer->serialize($dto, 'json')
+            );
+        }
 
-        return JsonResponse::fromJsonString(
-            $serializer->serialize($dto, 'json')
-        );
+        return new Error("Operation échouer");
     }
 
     /**
@@ -133,7 +149,11 @@ class LdapController extends AbstractController
     ): JsonResponse {
         $result = $ldap->delete($fullDn);
         // TODO Check result.
+        if($result)
+        {
+            return new JsonResponse(['result'=>$result]);
+        }
 
-        return new JsonResponse([]);
+        return new Error("Operation échouer");
     }
 }
