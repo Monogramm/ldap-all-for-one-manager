@@ -3,11 +3,11 @@
 namespace App\Controller;
 
 use App\Service\Ldap\Client;
-use Error;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -52,23 +52,29 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/ldap/{fullDn}", name="get_ldap_entry", methods={"GET"})
+     * @Route("/api/ldap/{query}", name="get_ldap_entry", methods={"GET"})
      *
      * @return JsonResponse
      */
     public function getLdapEntryByDn(
-        string $fullDn,
+        string $query,
         Client $ldap,
         SerializerInterface $serializer
     ): JsonResponse {
         // TODO Add attributes option.
 
-        $entries = $ldap->search("(dn=$fullDn)");
+        $entries = $ldap->search("($query)");
 
         $entry = null;
-        if (!empty($entries) && is_array($entries)) {
-            $entry = $entries[0];
+        if (empty($entries) || ! is_array($entries)) {
+            // TODO Return translated error message.
+            return JsonResponse::create(null, 404);
+        } else if ( 1 !== count($entries) ) {
+            // Bad request: too many results.
+            // TODO Return translated error message.
+            return JsonResponse::create(null, 400);
         }
+        $entry = $entries[0];
 
         $dto = $serializer->serialize($entry, 'json');
         // TODO Serialize in base64 jpegPhoto.
@@ -93,17 +99,18 @@ class LdapController extends AbstractController
         );
 
         // TODO Deserialize from base64 jpegPhoto.
-       
-        $result = $ldap->create($dto->getDn(), $dto->getAttributes());
-        // TODO Check result.
-        if($result)
-        {
+
+        try {
+            // TODO Check result.
+            $result = $ldap->create($dto->getDn(), $dto->getAttributes());
+
             return JsonResponse::fromJsonString(
                 $serializer->serialize($dto, 'json')
             );
+        } catch (LdapException $exception) {
+            // TODO Log the exception.
+            return JsonResponse::create($exception->getMessage(), 500);
         }
-
-        return new Error("Operation échouer");
     }
 
     /**
@@ -127,15 +134,17 @@ class LdapController extends AbstractController
         );
         // TODO Deserialize from base64 jpegPhoto.
 
-        // TODO Check result.
-        if($ldap->update("($query)", $dto->getAttributes()))
-        {
+        try {
+            // TODO Check result.
+            $result = $ldap->update("($query)", $dto->getAttributes());
+
             return JsonResponse::fromJsonString(
                 $serializer->serialize($dto, 'json')
             );
+        } catch (LdapException $exception) {
+            // TODO Log the exception.
+            return JsonResponse::create($exception->getMessage(), 500);
         }
-
-        return new Error("Operation échouer");
     }
 
     /**
@@ -147,13 +156,17 @@ class LdapController extends AbstractController
         string $fullDn,
         Client $ldap
     ): JsonResponse {
-        $result = $ldap->delete($fullDn);
-        // TODO Check result.
-        if($result)
-        {
-            return new JsonResponse(['result'=>$result]);
+        $result = false;
+        $status = 400;
+        try {
+            $result = $ldap->delete($fullDn);
+            $status = 200;
+        } catch (LdapException $exception) {
+            // TODO Log the exception.
+            $result = $exception->getMessage();
+            $status = 500;
         }
 
-        return new Error("Operation échouer");
+        return JsonResponse::create($result, $status);
     }
 }
