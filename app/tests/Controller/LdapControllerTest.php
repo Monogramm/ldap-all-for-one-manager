@@ -99,10 +99,10 @@ class LdapControllerTest extends WebTestCase
             ->setMethods(['isBound', 'bind'])
             ->getMock();
     }
-    /*
+
     public function testGetLdapEntries()
     {
-        /*$this->buildLdapMock();
+        $this->buildLdapMock();
 
         $this->ldapConnectionMock->expects($this->exactly(0))
             ->method('isBound')
@@ -133,18 +133,20 @@ class LdapControllerTest extends WebTestCase
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
 
-        $ldap = new Ldap($this->ldapAdapterMock);*/
-        
-    /*
+        // TODO Mock the LDAP Adapter service.
+        $container = self::$container;
+        $container->set('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
+        //$container->set('app.ldap', $this->ldapAdapterMock);
+
         $query = '(&(description=Human)(objectClass=inetOrgPerson))';
         $attr = ["cn","sn"];
 
-        $this->client->request('GET', '/api/ldap',['query'=>$query,'attributes'=>$attr]);
+        $this->client->request('GET', '/api/ldap', ['query'=>$query,'attributes'=>$attr]);
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         //var_dump(json_decode($responseContent));
-    }*/
+    }
 
     /*
     public function testCreateLdapEntryByQuery()
