@@ -2,16 +2,18 @@ services:
     _defaults:
         public: true
 
-    # TODO Allow mocks of LDAP service.
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        public: true
-
-    app.ldap:
-        alias: Symfony\Component\Ldap\Adapter\ExtLdap\Adapter
-        public: true
-
     # If you need to access services in a test, create an alias
     # and then fetch that alias from the container. As a convention,
     # aliases are prefixed with test. For example:
     #
     # test.App\Service\MyService: '@App\Service\MyService'
+
+    # Allow mocks of LDAP service.
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        public: true
+        shared: false
+
+    #test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+    #    alias: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
+    #    public: true
+    #    shared: false

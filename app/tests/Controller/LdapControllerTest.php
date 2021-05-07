@@ -136,7 +136,9 @@ class LdapControllerTest extends WebTestCase
         // TODO Mock the LDAP Adapter service.
         $container = self::$container;
         $container->set('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
-        //$container->set('app.ldap', $this->ldapAdapterMock);
+        //$container->set('test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
+
+        var_dump($container->initialized('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'));
 
         $query = '(&(description=Human)(objectClass=inetOrgPerson))';
         $attr = ["cn","sn"];
