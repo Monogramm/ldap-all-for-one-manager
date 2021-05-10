@@ -9,11 +9,16 @@ services:
     # test.App\Service\MyService: '@App\Service\MyService'
 
     # Allow mocks of LDAP service.
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        public: true
-        shared: false
+    #Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+    #    public: true
+    #    shared: false
 
     #test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
     #    alias: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
     #    public: true
-    #    shared: false
+
+    # Allow mocks of LDAP service.
+    App\Service\Ldap\Client:
+        public: true
+        class: App\Tests\Service\Ldap\ClientMock
+        #shared: false

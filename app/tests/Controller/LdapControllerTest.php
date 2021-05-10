@@ -28,11 +28,11 @@ class LdapControllerTest extends WebTestCase
      */
     private $serializer;
 
-    public $userId = ['professor'];
-    public $commonName = 'cn=TEST T. TESTO';
-    public $surname = ['test'];
-    public $email = ["TEST@planetexpress.com", "testo@planetexpress.com"];
-    public $description = ['test'];
+    public $userId = ['cubert'];
+    public $commonName = 'cn=Cubert Farnsworth';
+    public $surname = ['Farnsworth'];
+    public $email = ['cubert@planetexpress.com', 'clone@planetexpress.com'];
+    public $description = ['Human'];
 
     public function setUp(): void
     {
@@ -133,15 +133,29 @@ class LdapControllerTest extends WebTestCase
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
 
-        // TODO Mock the LDAP Adapter service.
-        $container = self::$container;
-        $container->set('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
+        // FIXME Mock the Symfony LDAP service.
+        //$container = self::$container;
+        //$container->set('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
         //$container->set('test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
 
-        var_dump($container->initialized('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'));
+        // FIXME Mock the app LDAP service.
+        //$container = self::$container;
+        //$ldap = new \Symfony\Component\Ldap\Ldap($this->ldapAdapterMock);
+        //$ldapConfig = array(
+        //    'uid_key' => 'uid',
+        //    'mail_key' => 'mail',
+        //    'base_dn' => 'ou=people,dc=planetexpress,dc=com',
+        //    'is_ad' => false,
+        //    'ad_domain' => '',
+        //    'query' => '()',
+        //    'search_dn' => 'cn=admin,dc=planetexpress,dc=com',
+        //    'search_password' => 'GoodNewsEveryone'
+        //);
+        //$client = new \App\Service\Ldap\Client($ldap, $ldapConfig);
+        //$container->set('App\Service\Ldap\Client', $client);
 
         $query = '(&(description=Human)(objectClass=inetOrgPerson))';
-        $attr = ["cn","sn"];
+        $attr = ["uid","cn","sn"];
 
         $this->client->request('GET', '/api/ldap', ['query'=>$query,'attributes'=>$attr]);
 
