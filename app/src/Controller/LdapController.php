@@ -23,25 +23,34 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
-        //$query = json_decode($request->get('query', '{}'), true);
+        $query = $request->get('query', '(objectClass=inetOrgPerson)');
+        // Attributes option.
+        $attributes = $request->get('attributes', []);
+
+        // TODO Add query options.
+        //$page = (int) $request->get('page', 1);
+        //$size = (int) $request->get('size', 20);
+        //$scope = (int) $request->get('scope', QueryInterface::SCOPE_SUB);
         // TODO Add order option.
         //$orders  = json_decode($request->get('orders', null), true);
         // TODO Serialize in base64 jpegPhoto.
-        // TODO Add attributes option.
 
-        $query = $request->get('query', '()');
-        $attributes = $request->get('attributes', [""]);
-        
         $ldapEntries = $ldap->search($query);
 
-        foreach ($ldapEntries as $key => $entry) {
-            foreach ($attributes as $attr) {
-                $entries[$key][$attr] = ($entry->hasAttribute($attr) && !empty($entry->getAttribute($attr))) ?
-                    json_encode($entry->getAttribute($attr)) : "null";
-            }
-        }
+        $total = count($ldapEntries);
 
-        $total = count($entries);
+        // TODO Create a LdapEntry DTO for serialization from/to Entry
+        $entries = array();
+        foreach ($ldapEntries as $key => $entry) {
+            $entries[$key]['dn'] = $entry->getDn();
+
+            $entryAttributes = array();
+            foreach ($attributes as $attribute) {
+                $entryAttributes[$attribute] = ($entry->hasAttribute($attribute) && !empty($entry->getAttribute($attribute))) ?
+                    json_encode($entry->getAttribute($attribute)) : null;
+            }
+            $entries[$key]['attributes'] = $entryAttributes;
+        }
 
         $entries = $serializer->serialize($entries, 'json');
 
