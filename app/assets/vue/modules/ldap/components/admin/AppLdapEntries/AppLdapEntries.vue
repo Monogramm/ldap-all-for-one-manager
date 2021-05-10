@@ -37,7 +37,7 @@
           sortable
           :label="dnColumnLabel"
         >
-          {{ props.row.id }}
+          {{ props.row.dn }}
         </b-table-column>
 
         <b-table-column
@@ -47,13 +47,13 @@
           <div class="buttons">
             <b-button
               type="is-warning"
-              @click="edit(props.row.id)"
+              @click="edit(props.row.dn)"
             >
               {{ $t("common.edit") }}
             </b-button>
             <b-button
               type="is-danger"
-              @click="deleteLdapEntry(props.row.id)"
+              @click="deleteLdapEntry(props.row.dn)"
             >
               {{ $t("common.delete") }}
             </b-button>
