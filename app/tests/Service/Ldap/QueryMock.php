@@ -3,15 +3,13 @@
 namespace App\Tests\Service\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
+use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 
 class QueryMock extends AbstractQuery
 {
-    // As of PHP 7.2, we can use LDAP_CONTROL_PAGEDRESULTS instead of this
-    public const PAGINATION_OID = '1.2.840.113556.1.4.319';
-
-    /** @var Connection */
+    /** @var ConnectionMock */
     protected $connection;
 
     /** @var resource[] */
@@ -88,23 +86,15 @@ class QueryMock extends AbstractQuery
             $pageControl = $this->options['scope'] != static::SCOPE_BASE && $pageSize > 0;
             $cookie = '';
             do {
-                if ($pageControl) {
-                    $this->controlPagedResult($con, $pageSize, true, $cookie);
-                }
                 $sizeLimit = $itemsLeft;
                 if ($pageSize > 0 && $sizeLimit >= $pageSize) {
                     $sizeLimit = 0;
                 }
+                // TODO Define expected responses for tests
                 $search = $this->callSearchFunction($con, $func, $sizeLimit);
 
                 if (false === $search) {
-                    $ldapError = '';
-                    if ($errno = ldap_errno($con)) {
-                        $ldapError = sprintf(' LDAP error was [%d] %s', $errno, ldap_error($con));
-                    }
-                    if ($pageControl) {
-                        $this->resetPagination();
-                    }
+                    $ldapError = 'LDAP error';
 
                     throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
                 }
@@ -115,17 +105,10 @@ class QueryMock extends AbstractQuery
                 if (0 !== $maxItems && 0 === $itemsLeft) {
                     break;
                 }
-                if ($pageControl) {
-                    $cookie = $this->controlPagedResultResponse($con, $search, $cookie);
-                }
             } while (null !== $cookie && '' !== $cookie);
-
-            if ($pageControl) {
-                $this->resetPagination();
-            }
         }
 
-        return new Collection($this->connection, $this);
+        return new CollectionMock($this->connection, $this);
     }
 
     /**
@@ -158,79 +141,6 @@ class QueryMock extends AbstractQuery
     }
 
     /**
-     * Resets pagination on the current connection.
-     */
-    private function resetPagination()
-    {
-        $con = $this->connection->getResource();
-        $this->controlPagedResult($con, 0, false, '');
-        $this->serverctrls = [];
-
-        // This is a workaround for a bit of a bug in the above invocation
-        // of ldap_control_paged_result. Instead of indicating to extldap that
-        // we no longer wish to page queries on this link, this invocation sets
-        // the LDAP_CONTROL_PAGEDRESULTS OID with a page size of 0. This isn't
-        // well defined by RFC 2696 if there is no cookie present, so some servers
-        // will interpret it differently and do the wrong thing. Forcefully remove
-        // the OID for now until a fix can make its way through the versions of PHP
-        // the we support.
-        //
-        // This is not supported in PHP < 7.2, so these versions will remain broken.
-        $ctl = [];
-        ldap_get_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
-        if (!empty($ctl)) {
-            foreach ($ctl as $idx => $info) {
-                if (static::PAGINATION_OID == $info['oid']) {
-                    unset($ctl[$idx]);
-                }
-            }
-            ldap_set_option($con, \LDAP_OPT_SERVER_CONTROLS, $ctl);
-        }
-    }
-
-    /**
-     * Sets LDAP pagination controls.
-     *
-     * @param resource $con
-     */
-    private function controlPagedResult($con, int $pageSize, bool $critical, string $cookie): bool
-    {
-        if (\PHP_VERSION_ID < 70300) {
-            return ldap_control_paged_result($con, $pageSize, $critical, $cookie);
-        }
-        $this->serverctrls = [
-            [
-                'oid' => \LDAP_CONTROL_PAGEDRESULTS,
-                'isCritical' => $critical,
-                'value' => [
-                    'size' => $pageSize,
-                    'cookie' => $cookie,
-                ],
-            ],
-        ];
-
-        return true;
-    }
-
-    /**
-     * Retrieve LDAP pagination cookie.
-     *
-     * @param resource $con
-     * @param resource $result
-     */
-    private function controlPagedResultResponse($con, $result, string $cookie = ''): string
-    {
-        if (\PHP_VERSION_ID < 70300) {
-            ldap_control_paged_result_response($con, $result, $cookie);
-
-            return $cookie;
-        }
-        ldap_parse_result($con, $result, $errcode, $matcheddn, $errmsg, $referrals, $controls);
-
-        return $controls[\LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'] ?? '';
-    }
-
-    /**
      * Calls actual LDAP search function with the prepared options and parameters.
      *
      * @param resource $con
@@ -239,10 +149,28 @@ class QueryMock extends AbstractQuery
      */
     private function callSearchFunction($con, string $func, int $sizeLimit)
     {
-        if (\PHP_VERSION_ID < 70300) {
-            return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref']);
+        // TODO Define expected responses for tests
+        switch ($func) {
+            case 'ldap_read':
+                # code...
+                $ret = new Entry('uid=john.doe,ou=people,ou=example,ou=com');
+                break;
+
+            case 'ldap_list':
+                # code...
+                $ret = null;
+                break;
+
+            case 'ldap_search':
+                # code...
+                $ret = null;
+                break;
+
+            default:
+                $ret = null;
+                break;
         }
 
-        return @$func($con, $this->dn, $this->query, $this->options['filter'], $this->options['attrsOnly'], $sizeLimit, $this->options['timeout'], $this->options['deref'], $this->serverctrls);
+        return $ret;
     }
 }
