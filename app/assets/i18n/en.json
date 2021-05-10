@@ -245,6 +245,17 @@
     "filename": "Filename",
     "description": "Description"
   },
+  "ldap": {
+    "entries": {
+      "list": "LDAP Entries List",
+      "edit": "Edit LDAP Entry",
+      "create": "Create LDAP Entry",
+      "dn": "Distinguished Name",
+      "attribute": "Attribute",
+      "value": "Value",
+      "description": "Description"
+    }
+  },
   "background-jobs": {
     "admin": "Background jobs",
     "list": "Background jobs List"

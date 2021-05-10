@@ -245,6 +245,17 @@
     "filename": "Nom du fichier",
     "description": "Description"
   },
+  "ldap": {
+    "entries": {
+      "list": "Liste des entrées LDAP",
+      "edit": "Modification d'un paramètre",
+      "create": "Création d'un paramètre",
+      "dn": "Nom distinctif",
+      "attribute": "Attribut",
+      "value": "Valeur",
+      "description": "Description"
+    }
+  },
   "background-jobs": {
     "admin": "Tâches de fond",
     "list": "Liste des tâches de fonds"

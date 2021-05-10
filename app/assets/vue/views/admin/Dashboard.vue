@@ -22,7 +22,6 @@
 
 <script lang="ts">
 import router from "../../store/router";
-
 export default {
   name: "AdminDashboard",
   data(): any {
