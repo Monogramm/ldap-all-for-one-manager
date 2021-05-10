@@ -52,7 +52,10 @@ class LdapController extends AbstractController
             $entries[$key]['attributes'] = $entryAttributes;
         }
 
-        $entries = $serializer->serialize($entries, 'json');
+        $entries = $serializer->normalize(
+            $entries,
+            Entry::class
+        );
 
         return new JsonResponse([
             'total' => $total,
