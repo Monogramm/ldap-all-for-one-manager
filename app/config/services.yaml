@@ -75,9 +75,6 @@ services:
                 '%env(resolve:PAYPAL_CLIENT_SECRET)%'
         ]
 
-    Symfony\Component\Ldap\Ldap:
-        arguments: [ '@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter' ]
-
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
             -   host: '%env(resolve:LDAP_AUTH_HOST)%'
@@ -86,6 +83,9 @@ services:
                 options:
                     protocol_version: 3
                     referrals: false
+
+    Symfony\Component\Ldap\Ldap:
+        arguments: [ '@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter' ]
 
     App\Service\Ldap\Client:
         arguments:
