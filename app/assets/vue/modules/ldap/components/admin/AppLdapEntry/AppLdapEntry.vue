@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     isEdit() {
-      return !!this.ldapEntry.id;
+      return !!this.ldapEntry.dn;
     }
   },
   methods: {
