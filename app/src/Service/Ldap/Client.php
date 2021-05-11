@@ -2,6 +2,7 @@
 
 namespace App\Service\Ldap;
 
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
@@ -85,11 +86,11 @@ class Client
     }
 
     /**
-     * @return Entry[]|\Symfony\Component\Ldap\Adapter\CollectionInterface
+     * @return Entry[]|CollectionInterface
      *
      * @throws LdapException When option given doesn't match a ldap entry
      *
-     * @$ldappsalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @$ldappsalm-return CollectionInterface|array<array-key, Entry>
      */
     private function executeQuery(string $query, string $base_dn = null, array $options = [])
     {
@@ -125,16 +126,13 @@ class Client
      *
      * @throws LdapException
      */
-    public function update(string $query, array $attributes) : bool
+    public function update(string $fullDn, string $query, array $attributes = []) : bool
     {
         $entryManager = $this->ldap->getEntryManager();
 
         // TODO Replace query by fullDn.
         // Finding and updating an existing entry
-        $result = $this->executeQuery($query);
-
-        // FIXME Check result before doing anything on it
-        $entry = $result[0];
+        $entry = $this->get($query, $fullDn);
 
         if (empty($entry)) {
             return false;
@@ -171,11 +169,11 @@ class Client
     /**
      * Search LDAP tree.
      *
-     * @return Entry[]|\Symfony\Component\Ldap\Adapter\CollectionInterface
+     * @return Entry[]|CollectionInterface
      *
      * @throws LdapException
      *
-     * @psalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @psalm-return CollectionInterface|array<array-key, Entry>
      */
     public function search(string $query, string $base_dn = null, array $options = ['scope' => QueryInterface::SCOPE_SUB])
     {
@@ -186,11 +184,11 @@ class Client
     /**
      * Single-level search.
      *
-     * @return Entry[]|\Symfony\Component\Ldap\Adapter\CollectionInterface
+     * @return Entry[]|CollectionInterface
      *
      * @throws LdapException
      *
-     * @psalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @psalm-return CollectionInterface|array<array-key, Entry>
      */
     public function list(string $query, string $base_dn = null, array $options = [])
     {
@@ -210,6 +208,8 @@ class Client
     public function get(string $query, string $base_dn = null, array $options = [])
     {
         $get_options = array_merge(['scope' => QueryInterface::SCOPE_BASE], $options);
-        return $this->executeQuery($query, $base_dn, $get_options);
+        $results = $this->executeQuery($query, $base_dn, $get_options);
+
+        return !empty($results) && 1 === count($results) ? $results[0] : null;
     }
 }

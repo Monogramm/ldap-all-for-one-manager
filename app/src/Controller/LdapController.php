@@ -23,33 +23,61 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
-        $query = $request->get('query', '(objectClass=inetOrgPerson)');
-        // Attributes option.
-        $attributes = $request->get('attributes', []);
+        $query = $request->get('query', '(objectClass=*)');
+        $baseDn = $request->get('base', null);
 
-        // TODO Add query options.
-        //$page = (int) $request->get('page', 1);
-        //$size = (int) $request->get('size', 20);
-        //$scope = (int) $request->get('scope', QueryInterface::SCOPE_SUB);
-        // TODO Add order option.
+        $options = [];
+
+        $filters = json_decode($request->get('filters', '[]'), true);
+        if ( !empty($filters) ) {
+            $queryFilters = '';
+            foreach ($filters as $field => $value) {
+                switch ($field) {
+                    case 'dn':
+                        $queryFilters .= "($value)";
+                        break;
+
+                    default:
+                        $queryFilters .= "($field=$value)";
+                        break;
+                }
+            }
+            $query = "(&$queryFilters$query)";
+        }
+        // XXX Is there any way to ask LDAP server to sort results?
         //$orders  = json_decode($request->get('orders', null), true);
-        // TODO Serialize in base64 jpegPhoto.
 
-        $ldapEntries = $ldap->search($query);
+        // Attributes option.
+        $attributes = $request->get('attributes', ['dn']);
+        $options['filter'] = $attributes;
+
+        // Add query options.
+        $size = (int) $request->get('size', 0);
+        $max = (int) $request->get('max', 0);
+
+        $options['pageSize'] = $size;
+        $options['maxItems'] = $max;
+
+        $ldapEntries = $ldap->search($query, $baseDn, $options);
 
         $total = count($ldapEntries);
 
-        // TODO Create a LdapEntry DTO for serialization from/to Entry
+        // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
         $entries = array();
-        foreach ($ldapEntries as $key => $entry) {
-            $entries[$key]['dn'] = $entry->getDn();
+        foreach ($ldapEntries as $key => $ldapEntry) {
+            $entries[$key]['dn'] = $ldapEntry->getDn();
 
-            $entryAttributes = array();
-            foreach ($attributes as $attribute) {
-                $entryAttributes[$attribute] = ($entry->hasAttribute($attribute) && !empty($entry->getAttribute($attribute))) ?
-                    json_encode($entry->getAttribute($attribute)) : null;
+            // TODO Serialize in base64 jpegPhoto.
+            if ( !empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto')) ) {
+                // Serialize in base64 jpegPhoto.
+                $jpegPhotos = array();
+                foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
+                    $jpegPhotos[] = base64_encode($jpegPhoto);
+                }
+                $ldapEntry->setAttribute('jpegPhoto', $jpegPhotos);
             }
-            $entries[$key]['attributes'] = $entryAttributes;
+            // Rely on filter option to filter attributes
+            $entries[$key]['attributes'] = $ldapEntry->getAttributes();
         }
 
         $entries = $serializer->normalize(
@@ -64,32 +92,36 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/ldap/{query}", name="get_ldap_entry", methods={"GET"})
+     * @Route("/api/ldap/{entry}", name="get_ldap_entry", methods={"GET"})
      *
      * @return JsonResponse
      */
     public function getLdapEntryByDn(
-        string $query,
+        string $entry,
         Client $ldap,
+        Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
+        $query = $request->get('query', '(objectClass=*)');
         // TODO Add attributes option.
 
-        $entries = $ldap->search("($query)");
-
-        $entry = null;
-        if (empty($entries) || ! is_array($entries)) {
+        $ldapEntry = $ldap->get($query, $entry);
+        if ( empty($ldapEntry) ) {
             // TODO Return translated error message.
             return JsonResponse::create(null, 404);
-        } else if ( 1 !== count($entries) ) {
-            // Bad request: too many results.
-            // TODO Return translated error message.
-            return JsonResponse::create(null, 400);
         }
-        $entry = $entries[0];
 
-        $dto = $serializer->serialize($entry, 'json');
-        // TODO Serialize in base64 jpegPhoto.
+        // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
+        if ( !empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto')) ) {
+            // Serialize in base64 jpegPhoto.
+            $jpegPhotos = array();
+            foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
+                $jpegPhotos[] = base64_encode($jpegPhoto);
+            }
+            $ldapEntry->setAttribute('jpegPhoto', $jpegPhotos);
+        }
+
+        $dto = $serializer->serialize($ldapEntry, 'json');
 
         return JsonResponse::fromJsonString($dto);
     }
@@ -126,16 +158,18 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/admin/ldap/{query}", name="edit_ldap_entry", methods={"PUT"})
+     * @Route("/api/admin/ldap/{entry}", name="edit_ldap_entry", methods={"PUT"})
      *
      * @return JsonResponse
      */
     public function editLdapEntryByQuery(
-        string $query,
+        string $entry,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
+        $query = $request->get('query', '(objectClass=*)');
+
         /**
          * @var Ldap $dto
          */
@@ -148,7 +182,7 @@ class LdapController extends AbstractController
 
         try {
             // TODO Check result.
-            $result = $ldap->update("($query)", $dto->getAttributes());
+            $result = $ldap->update($query, $entry, $dto->getAttributes());
 
             return JsonResponse::fromJsonString(
                 $serializer->serialize($dto, 'json')
@@ -160,18 +194,18 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/admin/ldap/{fullDn}", name="delete_ldap_entry", methods={"DELETE"})
+     * @Route("/api/admin/ldap/{entry}", name="delete_ldap_entry", methods={"DELETE"})
      *
      * @return JsonResponse
      */
     public function deleteLdapEntry(
-        string $fullDn,
+        string $entry,
         Client $ldap
     ): JsonResponse {
         $result = false;
         $status = 400;
         try {
-            $result = $ldap->delete($fullDn);
+            $result = $ldap->delete($entry);
             $status = 200;
         } catch (LdapException $exception) {
             // TODO Log the exception.
