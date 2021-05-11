@@ -64,7 +64,7 @@ class Client
         if ($this->config['search_dn']) {
             $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
             $result = $this->ldap->query($this->config['base_dn'], $query)->execute();
-            if (1 !== $result->count()) {
+            if (1 !== count($result)) {
                 throw new BadCredentialsException('The presented username is invalid.');
             }
 
