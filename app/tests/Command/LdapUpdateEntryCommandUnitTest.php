@@ -15,8 +15,8 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
 {
 
     public $fullDn = 'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
-    public $query = '(cn=Hermes Conrad)';
-    public $attribute = '{"description":["Decapodian"]}';
+    public $query = '(objectClass=inetOrgPerson)';
+    public $attribute = '{"description":["Jamaican"]}';
 
     public function testExecute()
     {
