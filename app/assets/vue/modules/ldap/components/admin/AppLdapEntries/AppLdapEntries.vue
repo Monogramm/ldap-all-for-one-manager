@@ -19,13 +19,13 @@
         :aria-previous-label="previousPageLabel"
         :aria-page-label="pageLabel"
         :aria-current-label="currentPageLabel"
-        paginated
+        :paginated="perPage > 0"
         backend-pagination
         :total="total"
         :per-page="perPage"
-        backend-filtering
+        :backend-filtering="perPage > 0"
         :debounce-search="500"
-        backend-sorting
+        :backend-sorting="perPage > 0"
         @page-change="onPageChange"
         @filters-change="onFiltersChange"
         @sort="onSortingChange"

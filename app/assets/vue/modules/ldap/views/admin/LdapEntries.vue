@@ -27,7 +27,7 @@ export default {
   components: { AppLdapEntries },
   data() {
     return {
-      pagination: new Pagination(),
+      pagination: new Pagination(0, 0),
     };
   },
   computed: {
@@ -42,15 +42,21 @@ export default {
     },
     onPageChange(page: string) {
       this.pagination.page = page;
-      this.load();
+      if (this.pagination.size > 0) {
+        this.load();
+      }
     },
     onFiltersChange(filters: any) {
       this.pagination.criteria = new Criteria(filters);
-      this.load();
+      if (this.pagination.size > 0) {
+        this.load();
+      }
     },
     onSortingChange(field: string, order: string) {
       this.pagination.orderBy = new Sort(field, order);
-      this.load();
+      if (this.pagination.size > 0) {
+        this.load();
+      }
     },
     onEdit(paramId: string) {
       this.$router.push({ name: "LdapEntryEdit", params: { id: paramId } });
