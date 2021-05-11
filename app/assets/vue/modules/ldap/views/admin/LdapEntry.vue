@@ -1,7 +1,6 @@
 <template>
   <app-ldapEntry
-    :ldap-entry="item"
-    :types="types"
+    :ldap-entry="entry"
     :is-loading="isLoading"
     @updateParent="onChildPropsChanged"
     @submit="onSubmit"
@@ -10,7 +9,7 @@
 
 <script lang="ts">
 import { mapGetters } from "vuex";
-import { ILdapEntry } from "../../interfaces/entry";
+import { ILdapEntry, LdapEntry, LdapEntryDefault } from "../../interfaces/entry";
 
 import AppLdapEntry from "../../components/admin/AppLdapEntry/AppLdapEntry.vue";
 
@@ -25,7 +24,7 @@ export default {
   },
   data() {
     return {
-      types: [] as string[]
+      entry: new LdapEntry(null) as ILdapEntry
     };
   },
   computed: {
@@ -38,7 +37,9 @@ export default {
   created() {
     if (this.id) {
       this.$store
-        .dispatch("ldapEntry/get", this.id);
+        .dispatch("ldapEntry/get", this.id).then((result: ILdapEntry) => {
+          this.entry = result;
+        });
     }
   },
   methods: {
