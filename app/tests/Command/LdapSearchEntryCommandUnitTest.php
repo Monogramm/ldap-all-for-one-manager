@@ -302,12 +302,27 @@ class LdapSearchEntryCommandUnitTest extends AbstractUnitTestLdap
             ->method('isBound')
             ->willReturn(true);
 
-        $this->ldapConnectionMock->expects($this->never())
+        $this->ldapQueryMock->expects($this->any())
+            ->method('execute')
+            ->willReturn([
+                new Entry(
+                    "dn=$this->commonName,$this->baseDn",
+                    [
+                        'cn' => $this->commonName
+                    ]
+                )
+            ]);
+
+        $this->ldapConnectionMock->expects($this->once())
             ->method('bind');
 
-        $this->ldapAdapterMock->expects($this->never())
+        $this->ldapAdapterMock->expects($this->once())
             ->method('getConnection')
             ->willReturn($this->ldapConnectionMock);
+
+        $this->ldapAdapterMock->expects($this->once())
+            ->method('createQuery')
+            ->willReturn($this->ldapQueryMock);
 
         $ldap = new Ldap($this->ldapAdapterMock);
 
@@ -321,14 +336,16 @@ class LdapSearchEntryCommandUnitTest extends AbstractUnitTestLdap
         $application = new Application();
         $application->add($cmd);
 
-        $this->expectException(RuntimeException::class);
-
         $command = $application->find('app:ldap:search-entries');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             '--attr' => $this->attributes,
             '--labels' => $this->labels
         ]);
+
+        // the output of the command in the console
+        $code = $commandTester->getStatusCode();
+        $this->assertEquals(0, $code);
     }
 
     public function testExecuteNoLdapEntryFound()

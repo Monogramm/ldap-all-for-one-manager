@@ -41,16 +41,21 @@ class LdapSearchEntryCommand extends Command
             ->setDescription('Search LDAP Entries')
             ->setHelp('Search LDAP entries using a query.')
             ->addArgument(
+                'base',
+                InputArgument::OPTIONAL,
+                'LDAP Base Search DN. Must be a valid LDAP DN. Example: ou=people,ou=example,ou=com'
+            )
+            ->addArgument(
                 'query',
-                InputArgument::REQUIRED,
-                'LDAP Search query. Must be a valid LDAP search query. Example: (description=Human)'
+                InputArgument::OPTIONAL,
+                'LDAP Search query. Must be a valid LDAP search query. Example: (description=Human)',
+                '(objectClass=*)'
             )
             ->addOption(
                 'attr',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Attributes to retrieve. Example: uid,sn,cn',
-                'cn'
+                'Attributes to retrieve. DN will always be displayed. Example: uid,sn,cn'
             )
             ->addOption(
                 'labels',
@@ -71,30 +76,42 @@ class LdapSearchEntryCommand extends Command
         $symfonyStyle = new SymfonyStyle($input, $output);
         $symfonyStyle->comment("List of entries:");
 
+        $baseDn = $input->getArgument('base');
         $query = $input->getArgument('query');
 
+        // Attributes to retrieve from LDAP
         $attributes = explode(',', trim($input->getOption('attr')));
+        if (1 === count($attributes) || empty($attributes[0])) {
+            $attributes = [];
+        }
+        $attributes = array_unique($attributes);
+
+        // Attributes' labels
         $labels =  explode(',', $input->getOption('labels'));
-
-        $config = $this->returnConfig($input);
-
-        $ldapClient = new Client($this->ldap, $config);
-
-        $ldapEntries = $ldapClient->search($query);
-
         if (count($labels) !== count($attributes) || empty($labels[0])) {
             $labels = $attributes;
         }
-
         array_unshift($labels, 'dn');
+        $labels = array_unique($labels);
+
+        // Retrieve LDAP config from input or env var
+        $config = $this->returnConfig($input);
+
+        $ldapClient = new Client($this->ldap, $config);
+        $ldapClient->bind();
+
+        // Search LDAP entries (with forced filtering of attributes)
+        $options = [];
+        $options['filter'] = $attributes;
+        array_unshift($options['filter'], 'dn');
+        $ldapEntries = $ldapClient->search($query, $baseDn, $options);
 
         foreach ($ldapEntries as $key => $entry) {
-            $entryDn = $entry->getDn();
-            $entries[$key]['dn'] = $entryDn;
+            $entries[$key]['dn'] = $entry->getDn();
 
             foreach ($attributes as $attr) {
                 $entries[$key][$attr] = ($entry->hasAttribute($attr) && !empty($entry->getAttribute($attr))) ?
-                    json_encode($entry->getAttribute($attr)) : "null";
+                    json_encode($entry->getAttribute($attr)) : null;
             }
         }
 

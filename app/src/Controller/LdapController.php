@@ -58,6 +58,7 @@ class LdapController extends AbstractController
         $options['pageSize'] = $size;
         $options['maxItems'] = $max;
 
+        $ldap->bind();
         $ldapEntries = $ldap->search($query, $baseDn, $options);
 
         $total = count($ldapEntries);
@@ -67,7 +68,7 @@ class LdapController extends AbstractController
         foreach ($ldapEntries as $key => $ldapEntry) {
             $entries[$key]['dn'] = $ldapEntry->getDn();
 
-            // TODO Serialize in base64 jpegPhoto.
+            // Serialize in base64 jpegPhoto.
             if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {
                 // Serialize in base64 jpegPhoto.
                 $jpegPhotos = array();
@@ -105,6 +106,7 @@ class LdapController extends AbstractController
         $query = $request->get('query', '(objectClass=*)');
         // TODO Add attributes option.
 
+        $ldap->bind();
         $ldapEntry = $ldap->get($query, $entry);
         if (empty($ldapEntry)) {
             // TODO Return translated error message.
@@ -146,6 +148,7 @@ class LdapController extends AbstractController
 
         try {
             // TODO Check result.
+            $ldap->bind();
             $result = $ldap->create($dto->getDn(), $dto->getAttributes());
 
             return JsonResponse::fromJsonString(
@@ -171,7 +174,7 @@ class LdapController extends AbstractController
         $query = $request->get('query', '(objectClass=*)');
 
         /**
-         * @var Ldap $dto
+         * @var Entry $dto
          */
         $dto = $serializer->deserialize(
             $request->getContent(),
@@ -182,6 +185,7 @@ class LdapController extends AbstractController
 
         try {
             // TODO Check result.
+            $ldap->bind();
             $result = $ldap->update($query, $entry, $dto->getAttributes());
 
             return JsonResponse::fromJsonString(
@@ -205,6 +209,7 @@ class LdapController extends AbstractController
         $result = false;
         $status = 400;
         try {
+            $ldap->bind();
             $result = $ldap->delete($entry);
             $status = 200;
         } catch (LdapException $exception) {

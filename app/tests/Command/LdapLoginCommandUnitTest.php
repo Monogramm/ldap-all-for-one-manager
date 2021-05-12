@@ -38,14 +38,14 @@ class LdapLoginCommandUnitTest extends AbstractUnitTestLdap
             ->method('isBound')
             ->willReturn(true);
 
-        $this->ldapConnectionMock->expects($this->exactly(2))
+        $this->ldapConnectionMock->expects($this->any())
             ->method('bind');
 
-        $this->ldapAdapterMock->expects($this->exactly(2))
+        $this->ldapAdapterMock->expects($this->any())
             ->method('getConnection')
             ->willReturn($this->ldapConnectionMock);
 
-        $this->ldapAdapterMock->expects($this->exactly(2))
+        $this->ldapAdapterMock->expects($this->any())
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
 

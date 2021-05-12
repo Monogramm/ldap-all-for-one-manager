@@ -82,6 +82,7 @@ class LdapUpdateEntryCommand extends Command
         $config = $this->returnConfig($input);
 
         $ldapClient = new Client($this->ldap, $config);
+        $ldapClient->bind();
 
         if ($ldapClient->update($fullDn, $query, $jsonDecodeAttributes)) {
             $symfonyStyle->success("Following LDAP entry was successfully updated: $fullDn");

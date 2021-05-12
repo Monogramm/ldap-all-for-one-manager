@@ -6,6 +6,7 @@ use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -62,23 +63,24 @@ class Client
         );
 
         if ($this->config['search_dn']) {
-            $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-            $result = $this->ldap->query($this->config['base_dn'], $query)->execute();
-            if (1 !== count($result)) {
+            // Login with default credentials and search user
+            $this->bind();
+            $results = $this->search($query);
+
+            if (1 !== count($results)) {
                 throw new BadCredentialsException('The presented username is invalid.');
             }
 
-            $fullDn = $result[0]->getDn();
+            $fullDn = $results[0]->getDn();
         } else {
+            // Build full DN based on user ID and LDAP config
             $username = $this->ldap->escape($login, '', LdapInterface::ESCAPE_DN);
             $fullDn = sprintf('%s=%s,%s', $this->config['uid_key'], $username, $this->config['base_dn']);
         }
 
-        $this->ldap->bind($fullDn, $password);
+        $this->bind($fullDn, $password);
 
-        $results = $this->ldap->query($fullDn, $query)->execute();
-        // TODO Do not bind in executeQuery
-        //$results = $this->executeQuery($query, $fullDn);
+        $results = $this->executeQuery($query, $fullDn);
 
         $result = $results[0];
 
@@ -86,17 +88,37 @@ class Client
     }
 
     /**
+     * Open a connection bound to the LDAP.
+     *
+     * If no username / password is given, bind will be done with default search
+     * credentials from LDAP configuration.
+     *
+     * @param string $username A LDAP dn
+     * @param string $password A password
+     *
+     * @throws ConnectionException if username / password could not be bound
+     *
+     * @return void
+     */
+    public function bind($username = null, $password = null): void
+    {
+        if (empty($username) && empty($password)) {
+            $username = $this->config['search_dn'];
+            $password = $this->config['search_password'];
+        }
+
+        $this->ldap->bind($username, $password);
+    }
+
+    /**
      * @return Entry[]|CollectionInterface
      *
-     * @throws LdapException When option given doesn't match a ldap entry
+     * @throws LdapException When option given doesn't match a LDAP entry
      *
      * @$ldappsalm-return CollectionInterface|array<array-key, Entry>
      */
     private function executeQuery(string $query, string $base_dn = null, array $options = [])
     {
-        // TODO Do not bind in executeQuery (must be done only once before executing query)
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-
         if (empty($base_dn)) {
             $base_dn = $this->config['base_dn'];
         }
@@ -111,10 +133,7 @@ class Client
      */
     public function create(string $fullDn, array $attributes): bool
     {
-        // TODO Do not bind inside search (must be done before)
         $entryManager = $this->ldap->getEntryManager();
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-
         $entry = new Entry($fullDn, $attributes);
 
         // XXX Check if its possible to return the saved LDAP entry.
@@ -128,10 +147,8 @@ class Client
      */
     public function update(string $fullDn, string $query, array $attributes = []) : bool
     {
-        $entryManager = $this->ldap->getEntryManager();
-
-        // TODO Replace query by fullDn.
         // Finding and updating an existing entry
+        $entryManager = $this->ldap->getEntryManager();
         $entry = $this->get($query, $fullDn);
 
         if (empty($entry)) {
@@ -141,7 +158,7 @@ class Client
         foreach ($attributes as $key => $value) {
             $entry->setAttribute($key, $value);
         }
-        // XXX Check if its possible to return the saved LDAP entry.
+        // XXX Check if it's possible to return the saved LDAP entry.
         $entryManager->update($entry);
 
         return true;
@@ -156,9 +173,6 @@ class Client
      */
     public function delete(string $fullDn)
     {
-        // TODO Do not bind here (must be done only once before executing query)
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-
         // Removing an existing entry
         $entryManager = $this->ldap->getEntryManager();
         $entryManager->remove(new Entry($fullDn));
