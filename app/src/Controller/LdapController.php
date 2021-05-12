@@ -29,7 +29,7 @@ class LdapController extends AbstractController
         $options = [];
 
         $filters = json_decode($request->get('filters', '[]'), true);
-        if ( !empty($filters) ) {
+        if (!empty($filters)) {
             $queryFilters = '';
             foreach ($filters as $field => $value) {
                 switch ($field) {
@@ -68,7 +68,7 @@ class LdapController extends AbstractController
             $entries[$key]['dn'] = $ldapEntry->getDn();
 
             // TODO Serialize in base64 jpegPhoto.
-            if ( !empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto')) ) {
+            if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {
                 // Serialize in base64 jpegPhoto.
                 $jpegPhotos = array();
                 foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
@@ -106,13 +106,13 @@ class LdapController extends AbstractController
         // TODO Add attributes option.
 
         $ldapEntry = $ldap->get($query, $entry);
-        if ( empty($ldapEntry) ) {
+        if (empty($ldapEntry)) {
             // TODO Return translated error message.
             return JsonResponse::create(null, 404);
         }
 
         // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
-        if ( !empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto')) ) {
+        if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {
             // Serialize in base64 jpegPhoto.
             $jpegPhotos = array();
             foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
