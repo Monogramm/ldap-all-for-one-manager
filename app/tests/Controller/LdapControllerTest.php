@@ -102,6 +102,8 @@ class LdapControllerTest extends WebTestCase
 
     public function testGetLdapEntries()
     {
+        // TODO Remove mocks
+        /*
         $this->buildLdapMock();
 
         $this->ldapConnectionMock->expects($this->exactly(0))
@@ -132,6 +134,7 @@ class LdapControllerTest extends WebTestCase
         $this->ldapAdapterMock->expects($this->once())
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
+        */
 
         // FIXME Mock the Symfony LDAP service.
         //$container = self::$container;
@@ -212,5 +215,4 @@ class LdapControllerTest extends WebTestCase
         $responseContent = $this->client->getResponse()->getContent();
         var_dump($responseContent);
     }*/
-
 }

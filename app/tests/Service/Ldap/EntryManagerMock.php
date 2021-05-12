@@ -45,8 +45,15 @@ class EntryManagerMock implements EntryManagerInterface
     {
         $con = $this->getConnectionResource();
 
-        if (!@ldap_modify($con, $entry->getDn(), $entry->getAttributes())) {
-            throw new LdapException(sprintf('Could not update entry "%s": ', $entry->getDn()));
+        // TODO Define expected responses for tests
+        switch ($entry->getDn()) {
+            case 'uid=exception':
+                throw new LdapException(sprintf('Could not update entry "%s": ', $entry->getDn()));
+                break;
+
+            default:
+                # code...
+                break;
         }
     }
 
@@ -184,7 +191,7 @@ class EntryManagerMock implements EntryManagerInterface
         // TODO Define expected responses for tests
         switch ($dn) {
             case 'uid=exception':
-                throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, ldap_error($con)));
+                throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, null));
                 break;
 
             default:

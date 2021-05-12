@@ -29,10 +29,10 @@ class ClientMock extends Client
         'search_password' => 'GoodNewsEveryone'
     );
 
-    public function __construct() {
+    public function __construct()
+    {
         $ldapAdapterMock = new AdapterMock(static::ADAPTER_TEST_CONFIG);
         $ldap = new Ldap($ldapAdapterMock);
         parent::__construct($ldap, static::TEST_CONFIG);
     }
-
 }

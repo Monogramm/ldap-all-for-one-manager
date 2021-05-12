@@ -12,7 +12,7 @@ class QueryMock extends AbstractQuery
     /** @var ConnectionMock */
     protected $connection;
 
-    /** @var resource[] */
+    /** @var array */
     private $results;
 
     /** @var array */
@@ -131,7 +131,7 @@ class QueryMock extends AbstractQuery
     /**
      * Returns all LDAP search resources.
      *
-     * @return resource[]
+     * @return array
      *
      * @internal
      */
@@ -145,7 +145,7 @@ class QueryMock extends AbstractQuery
      *
      * @param resource $con
      *
-     * @return resource
+     * @return array
      */
     private function callSearchFunction($con, string $func, int $sizeLimit)
     {
@@ -153,17 +153,37 @@ class QueryMock extends AbstractQuery
         switch ($func) {
             case 'ldap_read':
                 # code...
-                $ret = new Entry('uid=john.doe,ou=people,ou=example,ou=com');
+                //$ret = new Entry('uid=john.doe,ou=people,ou=example,ou=com');
+                $ret = array(
+                    'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                    'attributes'=> array(
+                        'uid'=>['john.doe']
+                    )
+                );
                 break;
 
             case 'ldap_list':
                 # code...
-                $ret = null;
+                $ret = array(
+                    array(
+                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                        'attributes'=> array(
+                            'uid'=>['john.doe']
+                        )
+                    )
+                );
                 break;
 
             case 'ldap_search':
                 # code...
-                $ret = null;
+                $ret = array(
+                    array(
+                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                        'attributes'=> array(
+                            'uid'=>['john.doe']
+                        )
+                    )
+                );
                 break;
 
             default:

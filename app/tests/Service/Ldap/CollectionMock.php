@@ -62,19 +62,13 @@ class CollectionMock implements CollectionInterface
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
         foreach ($searches as $search) {
-            // TODO Define expected responses for tests
-            $current = ldap_first_entry($con, $search);
+            $current = $search;
 
             if (false === $current) {
                 throw new LdapException('Could not rewind entries array: ');
             }
 
             yield $this->getSingleEntry($con, $current);
-
-            // TODO Define expected responses for tests
-            while (false !== $current = ldap_next_entry($con, $current)) {
-                yield $this->getSingleEntry($con, $current);
-            }
         }
     }
 
@@ -111,8 +105,7 @@ class CollectionMock implements CollectionInterface
 
     private function getSingleEntry($con, $current): Entry
     {
-        // TODO Define expected responses for tests
-        $attributes = ldap_get_attributes($con, $current);
+        $attributes = $current['attributes'];
 
         if (false === $attributes) {
             throw new LdapException('Could not fetch attributes: ');
@@ -120,8 +113,7 @@ class CollectionMock implements CollectionInterface
 
         $attributes = $this->cleanupAttributes($attributes);
 
-        // TODO Define expected responses for tests
-        $dn = ldap_get_dn($con, $current);
+        $dn = $current['dn'];
 
         if (false === $dn) {
             throw new LdapException('Could not fetch DN: ');
