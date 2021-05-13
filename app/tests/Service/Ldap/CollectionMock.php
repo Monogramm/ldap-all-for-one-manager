@@ -38,9 +38,14 @@ class CollectionMock implements CollectionInterface
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
         $count = 0;
+
         foreach ($searches as $search) {
+            // Count the number of entries
+            //count((array)$search->getAttributes())
+
             // TODO Define expected responses for tests
-            $searchCount = 0;
+            $searchCount = count($search[0]['attributes']);
+
             if (false === $searchCount) {
                 throw new LdapException('Error while retrieving entry count: ');
             }
@@ -55,12 +60,13 @@ class CollectionMock implements CollectionInterface
      */
     public function getIterator()
     {
-        if (0 === $this->count()) {
-            return;
-        }
+        // if (0 === $this->count()) {
+        //     return;
+        // }
 
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
+
         foreach ($searches as $search) {
             $current = $search;
 
@@ -77,6 +83,7 @@ class CollectionMock implements CollectionInterface
      */
     public function offsetExists($offset)
     {
+
         $this->toArray();
 
         return isset($this->entries[$offset]);
@@ -105,15 +112,15 @@ class CollectionMock implements CollectionInterface
 
     private function getSingleEntry($con, $current): Entry
     {
-        $attributes = $current['attributes'];
-
+        $attributes = $current[0]['attributes'];
+        
         if (false === $attributes) {
             throw new LdapException('Could not fetch attributes: ');
         }
 
-        $attributes = $this->cleanupAttributes($attributes);
+        //$attributes = $this->cleanupAttributes($attributes);
 
-        $dn = $current['dn'];
+        $dn = $current[0]['dn'];
 
         if (false === $dn) {
             throw new LdapException('Could not fetch DN: ');
@@ -131,7 +138,7 @@ class CollectionMock implements CollectionInterface
         array_walk($attributes, function (&$value) {
             unset($value['count']);
         });
-
+        
         return $attributes;
     }
 }

@@ -58,7 +58,7 @@ class QueryMock extends AbstractQuery
 
             $this->results = [];
             $con = $this->connection->getResource();
-
+            
             switch ($this->options['scope']) {
                 case static::SCOPE_BASE:
                     $func = 'ldap_read';

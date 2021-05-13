@@ -29,7 +29,7 @@ class LdapControllerTest extends WebTestCase
     private $serializer;
 
     public $userId = ['cubert'];
-    public $commonName = 'cn=Cubert Farnsworth';
+    public $commonName = 'cn=Hermes Conrad';
     public $surname = ['Farnsworth'];
     public $email = ['cubert@planetexpress.com', 'clone@planetexpress.com'];
     public $description = ['Human'];
@@ -69,123 +69,39 @@ class LdapControllerTest extends WebTestCase
         return $client;
     }
 
-    public function buildLdapMock()
-    {
-        $this->ldapQueryMock = $this->getMockBuilder(QueryInterface::class)
-            ->disableOriginalClone()
-            ->disableProxyingToOriginalMethods()
-            ->disableOriginalConstructor()
-            ->setMethods(['execute'])
-            ->getMock();
-
-        $this->ldapAdapterMock = $this->getMockBuilder(AdapterInterface::class)
-            ->disableOriginalClone()
-            ->disableProxyingToOriginalMethods()
-            ->disableOriginalConstructor()
-            ->setMethods(['getConnection', 'createQuery', 'getEntryManager', 'escape'])
-            ->getMock();
-
-        $this->ldapEntryManagerMock = $this->getMockBuilder(EntryManagerInterface::class)
-            ->disableOriginalClone()
-            ->disableProxyingToOriginalMethods()
-            ->disableOriginalConstructor()
-            ->setMethods(['add','update','rename','remove'])
-            ->getMock();
-
-        $this->ldapConnectionMock = $this->getMockBuilder(ConnectionInterface::class)
-            ->disableOriginalClone()
-            ->disableProxyingToOriginalMethods()
-            ->disableOriginalConstructor()
-            ->setMethods(['isBound', 'bind'])
-            ->getMock();
-    }
-
     public function testGetLdapEntries()
     {
-        // TODO Remove mocks
-        /*
-        $this->buildLdapMock();
 
-        $this->ldapConnectionMock->expects($this->exactly(0))
-            ->method('isBound')
-            ->willReturn(true);
+        $query = "($this->commonName)";
+        //$attr = ['uid','cn','sn'];
 
-        $this->ldapQueryMock->expects($this->any())
-            ->method('execute')
-            ->willReturn([
-                new Entry(
-                    "dn=test,testbasdn",
-                    [
-                        'uid' => $this->userId,
-                        'mail' => $this->email,
-                        'sn' => $this->surname,
-                        'description' => $this->description
-                    ]
-                )
-            ]);
-
-        $this->ldapConnectionMock->expects($this->once())
-            ->method('bind');
-
-        $this->ldapAdapterMock->expects($this->once())
-            ->method('getConnection')
-            ->willReturn($this->ldapConnectionMock);
-
-        $this->ldapAdapterMock->expects($this->once())
-            ->method('createQuery')
-            ->willReturn($this->ldapQueryMock);
-        */
-
-        // FIXME Mock the Symfony LDAP service.
-        //$container = self::$container;
-        //$container->set('Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
-        //$container->set('test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter', $this->ldapAdapterMock);
-
-        // FIXME Mock the app LDAP service.
-        //$container = self::$container;
-        //$ldap = new \Symfony\Component\Ldap\Ldap($this->ldapAdapterMock);
-        //$ldapConfig = array(
-        //    'uid_key' => 'uid',
-        //    'mail_key' => 'mail',
-        //    'base_dn' => 'ou=people,dc=planetexpress,dc=com',
-        //    'is_ad' => false,
-        //    'ad_domain' => '',
-        //    'query' => '()',
-        //    'search_dn' => 'cn=admin,dc=planetexpress,dc=com',
-        //    'search_password' => 'GoodNewsEveryone'
-        //);
-        //$client = new \App\Service\Ldap\Client($ldap, $ldapConfig);
-        //$container->set('App\Service\Ldap\Client', $client);
-
-        $query = '(&(description=Human)(objectClass=inetOrgPerson))';
-        $attr = ["uid","cn","sn"];
-
-        $this->client->request('GET', '/api/ldap', ['query'=>$query,'attributes'=>$attr]);
+        $this->client->request('GET', '/api/ldap', ['query'=>$query]);
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         //var_dump(json_decode($responseContent));
     }
 
-    /*
+    
     public function testCreateLdapEntryByQuery()
     {
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $this->serializer = new Serializer($normalizers, $encoders);
         $attr =  $this->serializer->serialize(new Entry(
-            'cn=Test Test,ou=people,dc=planetexpress,dc=com',
+            'cn=Cubert Farnsworth,ou=people,dc=planetexpress,dc=com',
             [
-                "sn"=>["ts"],
+                "sn"=>["Farnsworth"],
                 "objectClass"=>["inetOrgPerson"]
             ]
         ), 'json');
         //var_dump($attr);
-        $this->client->request('POST', '/api/admin/ldap',[],[],[],$attr);
+        //TODO MOCK THE RESULT
+        $this->client->request('POST', '/api/admin/ldap', [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        var_dump($responseContent);
-    }*/
+        //var_dump($responseContent);
+    }
 
     /*
     public function testEditLdapEntryByQuery()

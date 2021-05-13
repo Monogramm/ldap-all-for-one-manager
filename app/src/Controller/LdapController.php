@@ -152,7 +152,7 @@ class LdapController extends AbstractController
             $result = $ldap->create($dto->getDn(), $dto->getAttributes());
 
             return JsonResponse::fromJsonString(
-                $serializer->serialize($dto, 'json')
+                $serializer->serialize($result, 'json')
             );
         } catch (LdapException $exception) {
             // TODO Log the exception.
