@@ -127,17 +127,28 @@ class Client
     }
 
     /**
-     * @return bool
+     * @return String|bool
      *
      * @throws LdapException When the query given was not right
      */
-    public function create(string $fullDn, array $attributes): bool
+    public function create(string $fullDn, array $attributes): String
     {
         $entryManager = $this->ldap->getEntryManager();
         $entry = new Entry($fullDn, $attributes);
 
+        $entryManager->add($entry);
+
         // XXX Check if its possible to return the saved LDAP entry.
-        return !empty($entryManager->add($entry));
+        //TODO IMPROVE THE QUERY
+        try {
+            $result = $this->search('(objectClass=*)', $fullDn)[0]->getDn();
+            return !empty($result) ? $result: false;
+        } catch (LdapException $e) {
+            throw $e;
+        }
+
+        return false;
+        //return !empty($entryManager->add($entry));
     }
 
     /**

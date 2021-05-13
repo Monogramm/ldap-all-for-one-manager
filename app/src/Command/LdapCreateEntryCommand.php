@@ -79,8 +79,8 @@ class LdapCreateEntryCommand extends Command
         $ldapClient = new Client($this->ldap, $config);
         $ldapClient->bind();
 
-        if ($ldapClient->create($distingName, $jsonDecodeAttributes)) {
-            $symfonyStyle->success("Following LDAP entry was successfuly create: $distingName");
+        if ($result = $ldapClient->create($distingName, $jsonDecodeAttributes)) {
+            $symfonyStyle->success("Following LDAP entry was successfuly create: $result");
             return 0;
         }
 
