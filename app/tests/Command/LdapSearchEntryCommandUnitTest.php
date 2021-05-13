@@ -241,7 +241,7 @@ class LdapSearchEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->assertEquals(0, $code);
     }
 
-    public function testExecuteWithoutAttributeAndLibelle()
+    public function testExecuteWithoutAttributeAndLabel()
     {
         $this->buildLdapMock();
 
