@@ -8,6 +8,8 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Ldap\Entry;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
 {
@@ -26,6 +28,18 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
             ->method('isBound')
             ->willReturn(true);
 
+        $this->ldapQueryMock->expects($this->any())
+            ->method('execute')
+            ->willReturn([
+                new Entry(
+                    "dn=cn=Cubert Farnsworth,ou=people,dc=planetexpress,dc=com",
+                    [
+                        'sn' => ['Farnsworth'],
+                        'objectClass' => ['inetOrgPerson']
+                    ]
+                )
+            ]);
+
         $this->ldapConnectionMock->expects($this->once())
             ->method('bind');
 
@@ -36,6 +50,10 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->ldapAdapterMock->expects($this->once())
             ->method('getEntryManager')
             ->willReturn($this->ldapEntryManagerMock);
+
+        $this->ldapAdapterMock->expects($this->once())
+            ->method('createQuery')
+            ->willReturn($this->ldapQueryMock);
 
         $this->ldapEntryManagerMock->expects($this->any())
             ->method('add')
@@ -212,7 +230,10 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
 
         $this->ldapEntryManagerMock->expects($this->any())
             ->method('add')
-            ->willReturn(false);
+            ->will($this->throwException(new LdapException));
+
+        $this->ldapAdapterMock->expects($this->never())
+            ->method('createQuery');
 
         $ldap = new Ldap($this->ldapAdapterMock);
 
@@ -226,16 +247,14 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $application = new Application();
         $application->add($cmd);
 
+        $this->expectException(LdapException::class);
+
         $command = $application->find('app:ldap:create-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'dn' => $this->dnWrong,
             'attr' => $this->attribute
         ]);
-
-        // the output of the command in the console
-        $code = $commandTester->getStatusCode();
-        $this->assertEquals(1, $code);
     }
 
     public function testExecuteBadDnAndAttributeFormat()
