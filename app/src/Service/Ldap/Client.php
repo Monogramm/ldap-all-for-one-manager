@@ -128,7 +128,7 @@ class Client
     }
 
     /**
-     * @return EntryManager
+     * @return String|bool
      *
      * @throws LdapException When the query given was not right
      */
