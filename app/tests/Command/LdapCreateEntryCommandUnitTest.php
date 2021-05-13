@@ -8,7 +8,6 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Console\Exception\RuntimeException;
-use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
@@ -28,18 +27,6 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
             ->method('isBound')
             ->willReturn(true);
 
-        $this->ldapQueryMock->expects($this->any())
-            ->method('execute')
-            ->willReturn([
-                new Entry(
-                    "dn=cn=Cubert Farnsworth,ou=people,dc=planetexpress,dc=com",
-                    [
-                        'sn' => ['Farnsworth'],
-                        'objectClass' => ['inetOrgPerson']
-                    ]
-                )
-            ]);
-
         $this->ldapConnectionMock->expects($this->once())
             ->method('bind');
 
@@ -50,10 +37,6 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->ldapAdapterMock->expects($this->once())
             ->method('getEntryManager')
             ->willReturn($this->ldapEntryManagerMock);
-
-        $this->ldapAdapterMock->expects($this->once())
-            ->method('createQuery')
-            ->willReturn($this->ldapQueryMock);
 
         $this->ldapEntryManagerMock->expects($this->any())
             ->method('add')
@@ -83,9 +66,6 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->assertEquals(0, $code);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testExecuteWithoutAttribute()
     {
         $this->buildLdapMock();
@@ -231,9 +211,6 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->ldapEntryManagerMock->expects($this->any())
             ->method('add')
             ->will($this->throwException(new LdapException));
-
-        $this->ldapAdapterMock->expects($this->never())
-            ->method('createQuery');
 
         $ldap = new Ldap($this->ldapAdapterMock);
 

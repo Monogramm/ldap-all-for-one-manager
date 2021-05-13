@@ -3,6 +3,7 @@
 namespace App\Service\Ldap;
 
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
+use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
@@ -127,28 +128,17 @@ class Client
     }
 
     /**
-     * @return String|bool
+     * @return EntryManager
      *
      * @throws LdapException When the query given was not right
      */
-    public function create(string $fullDn, array $attributes): String
+    public function create(string $fullDn, array $attributes): bool
     {
         $entryManager = $this->ldap->getEntryManager();
         $entry = new Entry($fullDn, $attributes);
 
-        $entryManager->add($entry);
-
         // XXX Check if its possible to return the saved LDAP entry.
-        //TODO IMPROVE THE QUERY
-        try {
-            $result = $this->search('(objectClass=*)', $fullDn)[0]->getDn();
-            return !empty($result) ? $result: false;
-        } catch (LdapException $e) {
-            throw $e;
-        }
-
-        return false;
-        //return !empty($entryManager->add($entry));
+        return !empty($entryManager->add($entry));
     }
 
     /**
