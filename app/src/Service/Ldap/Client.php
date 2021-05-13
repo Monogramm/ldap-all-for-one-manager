@@ -117,13 +117,13 @@ class Client
      *
      * @$ldappsalm-return CollectionInterface|array<array-key, Entry>
      */
-    private function executeQuery(string $query, string $base_dn = null, array $options = [])
+    private function executeQuery(string $query, string $baseDn = null, array $options = [])
     {
-        if (empty($base_dn)) {
-            $base_dn = $this->config['base_dn'];
+        if (empty($baseDn)) {
+            $baseDn = $this->config['base_dn'];
         }
 
-        return $this->ldap->query($base_dn, $query, $options)->execute();
+        return $this->ldap->query($baseDn, $query, $options)->execute();
     }
 
     /**
@@ -200,10 +200,13 @@ class Client
      *
      * @psalm-return CollectionInterface|array<array-key, Entry>
      */
-    public function search(string $query, string $base_dn = null, array $options = ['scope' => QueryInterface::SCOPE_SUB])
+    public function search(string $query, string $baseDn = null, array $options = ['scope' => QueryInterface::SCOPE_SUB])
     {
-        $search_options = array_merge(['scope' => QueryInterface::SCOPE_SUB], $options);
-        return $this->executeQuery($query, $base_dn, $search_options);
+        $searchOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_SUB],
+            $options
+        );
+        return $this->executeQuery($query, $baseDn, $searchOptions);
     }
 
     /**
@@ -215,10 +218,13 @@ class Client
      *
      * @psalm-return CollectionInterface|array<array-key, Entry>
      */
-    public function list(string $query, string $base_dn = null, array $options = [])
+    public function list(string $query, string $baseDn = null, array $options = [])
     {
-        $list_options = array_merge(['scope' => QueryInterface::SCOPE_ONE], $options);
-        return $this->executeQuery($query, $base_dn, $list_options);
+        $listOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_ONE],
+            $options
+        );
+        return $this->executeQuery($query, $baseDn, $listOptions);
     }
 
     /**
@@ -230,10 +236,13 @@ class Client
      *
      * @psalm-return Entry
      */
-    public function get(string $query, string $base_dn = null, array $options = [])
+    public function get(string $query, string $baseDn = null, array $options = [])
     {
-        $get_options = array_merge(['scope' => QueryInterface::SCOPE_BASE], $options);
-        $results = $this->executeQuery($query, $base_dn, $get_options);
+        $getOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_BASE],
+            $options
+        );
+        $results = $this->executeQuery($query, $baseDn, $getOptions);
 
         return !empty($results) && 1 === count($results) ? $results[0] : null;
     }

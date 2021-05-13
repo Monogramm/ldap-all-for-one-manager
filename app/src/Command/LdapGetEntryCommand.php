@@ -5,6 +5,7 @@ namespace App\Command;
 use App\Service\Ldap\Client;
 use App\Command\BuildLdapConfig;
 use RuntimeException;
+use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -113,28 +114,7 @@ class LdapGetEntryCommand extends Command
             }
 
             // Manage output formats.
-            switch ($format) {
-                case 'ldif':
-                    $outputEntry = "\n";
-                    $outputEntry .= 'dn: ' . $ldapEntry->getDn() . "\n";
-                    foreach ($ldapEntry->getAttributes() as $key => $values) {
-                        if (empty($values) || ! is_array($values)) {
-                            continue;
-                        }
-                        foreach ($values as $value) {
-                            $outputEntry .= $key . ': ' . $value . "\n";
-                        }
-                    }
-                    break;
-
-                case 'json':
-                    $outputEntry = json_encode($ldapEntry->getAttributes());
-                    break;
-
-                default:
-                    throw new RuntimeException('Unknown format: ' . $format);
-                    break;
-            }
+            $outputEntry = $this->serializeEntry($ldapEntry, $format);
             $symfonyStyle->text($outputEntry);
 
             return 0;
@@ -143,4 +123,35 @@ class LdapGetEntryCommand extends Command
         $symfonyStyle->error('No matching LDAP entry was found.');
         return 1;
     }
+
+    private function serializeEntry(Entry $ldapEntry, string $format) {
+        // TODO Put this into a static function in LdapEntry DTO.
+        $outputEntry = '';
+
+        switch ($format) {
+            case 'ldif':
+                $outputEntry = "\n";
+                $outputEntry .= 'dn: ' . $ldapEntry->getDn() . "\n";
+                foreach ($ldapEntry->getAttributes() as $key => $values) {
+                    if (empty($values) || ! is_array($values)) {
+                        continue;
+                    }
+                    foreach ($values as $value) {
+                        $outputEntry .= $key . ': ' . $value . "\n";
+                    }
+                }
+                break;
+
+            case 'json':
+                $outputEntry = json_encode($ldapEntry->getAttributes());
+                break;
+
+            default:
+                throw new RuntimeException('Unknown format: ' . $format);
+                break;
+        }
+
+        return $outputEntry;
+    }
+
 }

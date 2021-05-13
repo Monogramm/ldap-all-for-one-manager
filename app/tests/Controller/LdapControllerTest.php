@@ -79,7 +79,9 @@ class LdapControllerTest extends WebTestCase
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        //var_dump(json_decode($responseContent));
+        $responseEntries = json_decode($responseContent, true);
+        $this->assertCount(1, $responseEntries);
+        //var_dump($responseEntries);
     }
 
     
