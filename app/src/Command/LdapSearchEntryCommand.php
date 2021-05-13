@@ -81,7 +81,7 @@ class LdapSearchEntryCommand extends Command
 
         // Attributes to retrieve from LDAP
         $attributes = explode(',', trim($input->getOption('attr')));
-        if (1 === count($attributes) || empty($attributes[0])) {
+        if (1 === count($attributes) && empty($attributes[0])) {
             $attributes = [];
         }
         $attributes = array_unique($attributes);
