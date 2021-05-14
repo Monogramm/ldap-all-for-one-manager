@@ -28,8 +28,9 @@ class LdapControllerTest extends WebTestCase
      */
     private $serializer;
 
+    public $fullDn = 'uid=john.doe,ou=people,ou=example,ou=com';
     public $userId = ['cubert'];
-    public $commonName = 'cn=Hermes Conrad';
+    public $query = '(cn=Hermes Conrad)';
     public $surname = ['Farnsworth'];
     public $email = ['cubert@planetexpress.com', 'clone@planetexpress.com'];
     public $description = ['Human'];
@@ -65,26 +66,21 @@ class LdapControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
-
+        $client->catchExceptions(false);
         return $client;
     }
-
+   
     public function testGetLdapEntries()
     {
-
-        $query = "($this->commonName)";
-        //$attr = ['uid','cn','sn'];
-
-        $this->client->request('GET', '/api/ldap', ['query'=>$query]);
+        $this->client->request('GET', '/api/ldap', ['base'=>$this->fullDn,'query'=>$this->query]);
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $responseEntries = json_decode($responseContent, true);
-        $this->assertCount(1, $responseEntries);
-        //var_dump($responseEntries);
+        $this->assertCount(2, $responseEntries);
+        $this->assertNotEmpty($responseEntries['items']);
     }
 
-    
     public function testCreateLdapEntryByQuery()
     {
         $encoders = [new XmlEncoder(), new JsonEncoder()];
@@ -97,15 +93,13 @@ class LdapControllerTest extends WebTestCase
                 "objectClass"=>["inetOrgPerson"]
             ]
         ), 'json');
-        //var_dump($attr);
-        //TODO MOCK THE RESULT
+
         $this->client->request('POST', '/api/admin/ldap', [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        //var_dump($responseContent);
+        $this->assertEquals("true", $responseContent);
     }
-
-    /*
+    
     public function testEditLdapEntryByQuery()
     {
         $encoders = [new XmlEncoder(), new JsonEncoder()];
@@ -117,20 +111,19 @@ class LdapControllerTest extends WebTestCase
                 'description' => ["Decapodian"]
             ]
         ), 'json');
-
-        $this->client->request('PUT', '/api/admin/ldap/cn=Hubert J. Farnsworth',[],[],[],$attr);
+       
+        $this->client->request('PUT', '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com', [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        var_dump($responseContent);
-    }*/
+        $this->assertEquals("true", $responseContent);
+    }
 
-    /*
     public function testDeleteLdapEntryByQuery()
     {
         $fullDn = 'cn=Test Test,ou=people,dc=planetexpress,dc=com';
         $this->client->request('DELETE', "/api/admin/ldap/{$fullDn}");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        var_dump($responseContent);
-    }*/
+        $this->assertEquals("true", $responseContent);
+    }
 }

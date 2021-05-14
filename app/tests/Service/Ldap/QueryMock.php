@@ -155,23 +155,23 @@ class QueryMock extends AbstractQuery
                 # code...
                 //$ret = new Entry('uid=john.doe,ou=people,ou=example,ou=com');
                 $ret = array(
-                    'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
-                    'attributes'=> array(
-                        'uid'=>['john.doe']
-                    )
-                );
+                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                        'attributes'=> array(
+                            'uid'=>['john.doe']
+                        )
+                    );
                 break;
 
             case 'ldap_list':
                 # code...
                 $ret = array(
-                    array(
-                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
-                        'attributes'=> array(
-                            'uid'=>['john.doe']
+                        array(
+                            'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                            'attributes'=> array(
+                                'uid'=>['john.doe']
+                            )
                         )
-                    )
-                );
+                    );
                 break;
 
             case 'ldap_search':

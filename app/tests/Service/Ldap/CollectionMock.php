@@ -37,20 +37,24 @@ class CollectionMock implements CollectionInterface
     {
         $con = $this->connection->getResource();
         $searches = $this->search->getResources();
-        $count = 0;
-
+        $count = 1;
+        /*
         foreach ($searches as $search) {
             // Count the number of entries
             //count((array)$search->getAttributes())
 
             // TODO Define expected responses for tests
-            $searchCount = count($search[0]['attributes']);
+            $t = count($search[0]['attributes']);
+            echo "\n---------------\n";
+            var_dump($t);
+            echo "\n---------------\n";
+            $searchCount = $t;
 
             if (false === $searchCount) {
                 throw new LdapException('Error while retrieving entry count: ');
             }
             $count += $searchCount;
-        }
+        }*/
 
         return $count;
     }
@@ -112,19 +116,39 @@ class CollectionMock implements CollectionInterface
 
     private function getSingleEntry($con, $current): Entry
     {
-        $attributes = $current[0]['attributes'];
-        
-        if (false === $attributes) {
-            throw new LdapException('Could not fetch attributes: ');
+        //Check the depth of the array
+        switch ($current) {
+            case isset($current[0]):
+                $attributes = $current[0]['attributes'];
+                break;
+            case isset($current['attributes']):
+                $attributes = $current['attributes'];
+                break;
+            default:
+                throw new LdapException('Could not fetch attributes: ');
         }
+
+        //Check the depth of the array
+        switch ($current) {
+            case isset($current[0]):
+                $dn = $current[0]['dn'];
+                break;
+            case isset($current['dn']):
+                $dn = $current['dn'];
+                break;
+            default:
+                throw new LdapException('Could not fetch DN: ');
+        }
+
+        // if (false === $attributes) {
+        //     throw new LdapException('Could not fetch attributes: ');
+        // }
 
         //$attributes = $this->cleanupAttributes($attributes);
 
-        $dn = $current[0]['dn'];
-
-        if (false === $dn) {
-            throw new LdapException('Could not fetch DN: ');
-        }
+        // if (false === $dn) {
+        //     throw new LdapException('Could not fetch DN: ');
+        // }
 
         return new Entry($dn, $attributes);
     }
