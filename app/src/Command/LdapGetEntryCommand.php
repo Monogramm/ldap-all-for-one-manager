@@ -13,6 +13,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\DTO\LdapEntryDTO;
 
 class LdapGetEntryCommand extends Command
 {
@@ -104,17 +105,10 @@ class LdapGetEntryCommand extends Command
 
         if (! empty($ldapEntry)) {
             // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
-            if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {
-                // Serialize in base64 jpegPhoto.
-                $jpegPhotos = array();
-                foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
-                    $jpegPhotos[] = base64_encode($jpegPhoto);
-                }
-                $ldapEntry->setAttribute('jpegPhoto', $jpegPhotos);
-            }
+            $ldapEntry = LdapEntryDTO::serializeJpegPhoto($ldapEntry);
 
             // Manage output formats.
-            $outputEntry = $this->serializeEntry($ldapEntry, $format);
+            $outputEntry = LdapEntryDTO::serializeEntry($ldapEntry, $format);
             $symfonyStyle->text($outputEntry);
 
             return 0;
@@ -123,35 +117,4 @@ class LdapGetEntryCommand extends Command
         $symfonyStyle->error('No matching LDAP entry was found.');
         return 1;
     }
-
-    private function serializeEntry(Entry $ldapEntry, string $format) {
-        // TODO Put this into a static function in LdapEntry DTO.
-        $outputEntry = '';
-
-        switch ($format) {
-            case 'ldif':
-                $outputEntry = "\n";
-                $outputEntry .= 'dn: ' . $ldapEntry->getDn() . "\n";
-                foreach ($ldapEntry->getAttributes() as $key => $values) {
-                    if (empty($values) || ! is_array($values)) {
-                        continue;
-                    }
-                    foreach ($values as $value) {
-                        $outputEntry .= $key . ': ' . $value . "\n";
-                    }
-                }
-                break;
-
-            case 'json':
-                $outputEntry = json_encode($ldapEntry->getAttributes());
-                break;
-
-            default:
-                throw new RuntimeException('Unknown format: ' . $format);
-                break;
-        }
-
-        return $outputEntry;
-    }
-
 }
