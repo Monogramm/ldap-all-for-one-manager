@@ -8,7 +8,7 @@
       </h1>
     </div>
     <template
-      v-for="(row, index) in valueArray.value"
+      v-for="(row, index) in entry.value"
     >
       <div
         :key="`valueInput:${index}`"
@@ -22,7 +22,7 @@
         </div>
         <div class="column is-7">
           <b-input
-            v-model="valueArray.value[index]"
+            v-model="entry.value[index]"
             type="text"
             placeholder="ldap attribute in json format"
           />
@@ -54,10 +54,12 @@ export default {
   name: "AppLdapAttribute",
   props: {
     indexinput : {
-      type: Number
+      type: Number,
+      default: 0
     },
     keyldap : {
-      type: String
+      type: String,
+      default: ''
     },
     isLoading: {
       type: Boolean,
@@ -66,8 +68,7 @@ export default {
   },
   data() {
     return {
-      valueArray: {key:this.keyldap,value:['']},
-      attributesArray: []
+      entry: {key:this.keyldap,value:['']},
     };
   },
   methods: {
@@ -75,24 +76,17 @@ export default {
       this.$emit("updateParent", property, value);
     },
     addField() {
-      this.valueArray.value.push('');
+      this.entry.value.push('');
     },
     removeField(index: Number) {
-      this.valueArray.value.splice(index, 1);
-    },
-    addEntry()
-    {
-      this.attributesArray = {key:this.keyldap,value:this.valueArray}
+      this.entry.value.splice(index, 1);
     },
     lastItem() {
-    	return this.valueArray.value.length-1;
+    	return this.entry.value.length-1;
     }
   }
 };
 </script>
 
-  <style
-    lang="scss"
-    scoped
-  />
-</template>
+<style lang="scss" scoped>
+</style>

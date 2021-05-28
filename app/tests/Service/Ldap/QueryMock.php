@@ -18,8 +18,12 @@ class QueryMock extends AbstractQuery
     // /** @var array */
     // private $serverctrls = [];
 
-    public function __construct(ConnectionMock $connection, string $distinguishedNames, string $query, array $options = [])
-    {
+    public function __construct(
+        ConnectionMock $connection,
+        string $distinguishedNames,
+        string $query,
+        array $options = []
+    ) {
         parent::__construct($connection, $distinguishedNames, $query, $options);
     }
 
@@ -58,7 +62,7 @@ class QueryMock extends AbstractQuery
             }
 
             $this->results = [];
-            $con = $this->connection->getResource();
+            // $con = $this->connection->getResource();
             
             switch ($this->options['scope']) {
                 case static::SCOPE_BASE:

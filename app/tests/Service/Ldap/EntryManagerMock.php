@@ -43,7 +43,7 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function update(Entry $entry)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
@@ -62,7 +62,7 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function remove(Entry $entry)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
@@ -114,7 +114,7 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function removeAttributeValues(Entry $entry, string $attribute, array $values)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
@@ -141,7 +141,7 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function rename(Entry $entry, $newRdn, $removeOldRdn = true)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
@@ -163,13 +163,13 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function move(Entry $entry, string $newParent)
     {
-        $con = $this->getConnectionResource();
-        $rdn = $this->parseRdnFromEntry($entry);
+        // $con = $this->getConnectionResource();
+        $rdnParse = $this->parseRdnFromEntry($entry);
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
             case 'uid=exception':
-                throw new LdapException(sprintf('Could not move entry "%s" to "%s": ', $rdn, $newParent));
+                throw new LdapException(sprintf('Could not move entry "%s" to "%s": ', $rdnParse, $newParent));
                 break;
 
             default:
@@ -203,7 +203,7 @@ class EntryManagerMock implements EntryManagerInterface
             $operationsMapped[] = $modification->toArray();
         }
 
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
         // TODO Define expected responses for tests
         switch ($distinguishedNames) {
             case 'uid=exception':

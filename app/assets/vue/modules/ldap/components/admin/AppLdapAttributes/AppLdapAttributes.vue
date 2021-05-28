@@ -11,14 +11,16 @@
       >
         {{ $t('common.delete') }}
       </b-button>
+
       <!-- Call AppLdapAttribute Component-->
       <app-ldap-attribute
         v-show="attributeArray != null"
         :key="`componentldapattribute:${index}`"
         :indexinput="index"
-        :keyldap="row.key"
+        :keyldap="row"
       />
     </template>
+
     <div class="columns">
       <!-- Input value key-->
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
@@ -58,8 +60,8 @@ export default {
   components: { AppLdapAttribute },
   props: {
     attributes: {
-      type: Array,
-      default: []
+      type: Object,
+      default: () => Array<any>(),
     },
     isLoading: {
       type: Boolean,
@@ -69,7 +71,7 @@ export default {
   data() {
     return {
       keyEntry: '',
-      attributeArray: [],
+      attributeArray: new Array,
       rowNumber: 0
     };
   },
@@ -80,7 +82,7 @@ export default {
   },
   methods: {
     addField() {
-      this.attributeArray.push({ key:this.keyEntry});
+      this.attributeArray.push(this.keyEntry);
     },
     removeField(index: Number) {
       this.attributeArray.splice(index, 1);
