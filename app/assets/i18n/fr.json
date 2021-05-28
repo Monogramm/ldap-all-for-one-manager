@@ -248,12 +248,13 @@
   "ldap": {
     "entries": {
       "list": "Liste des entrées LDAP",
-      "edit": "Modification d'un paramètre",
-      "create": "Création d'un paramètre",
+      "edit": "Modification d'une entrée LDAP",
+      "create": "Création d'une entrée LDAP",
       "dn": "Nom distinctif",
       "attribute": "Attribut",
       "value": "Valeur",
-      "description": "Description"
+      "description": "Description",
+      "add-a-attribute":"Ajouter un attribut"
     }
   },
   "background-jobs": {

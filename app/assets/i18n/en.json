@@ -253,7 +253,8 @@
       "dn": "Distinguished Name",
       "attribute": "Attribute",
       "value": "Value",
-      "description": "Description"
+      "description": "Description",
+      "add-a-attribute":"Add a attribue"
     }
   },
   "background-jobs": {

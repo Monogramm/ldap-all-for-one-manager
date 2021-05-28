@@ -212,4 +212,16 @@ class LdapController extends AbstractController
 
         return JsonResponse::create($result, $status);
     }
+
+    /**
+     * @Route("/api/admin/ldap/test", name="test_ldap_entry", methods={"PUT"})
+     *
+     * @return JsonResponse
+     */
+    public function testLdapEntry(): JsonResponse {
+
+        dump("TEST IS READY FOR DISPLAY");
+
+        return JsonResponse::create("TEST READY", 200);
+    }
 }

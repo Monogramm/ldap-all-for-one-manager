@@ -10,6 +10,36 @@ class LdapEntryDTO
     //TODO Create attrribute associate with LdapEntry
     //TODO Create getter and setter
 
+    /**
+     * @var string
+     */
+    public $dn;
+
+    /**
+     * @var array
+     */
+    public $attributes;
+
+    public function setdn($dn)
+    {
+        $this->dn = $dn;
+    }
+
+     public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+     public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
     public static function serializeEntry(Entry $ldapEntry, string $format)
     {
         $outputEntry = '';

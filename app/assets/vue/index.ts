@@ -124,6 +124,7 @@ import {
   faUsers,
   faCogs,
   faImages,
+  faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -169,6 +170,7 @@ library.add(
   faUsers,
   faCogs,
   faImages,
+  faTrash,
 );
 Vue.component("vue-fontawesome", FontAwesomeIcon);
 
