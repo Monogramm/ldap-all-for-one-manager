@@ -13,19 +13,19 @@ class LdapEntryDTO
     /**
      * @var string
      */
-    public $dn;
+    public $distinguishedNames;
 
     /**
      * @var array
      */
     public $attributes;
 
-    public function setdn($dn)
+    public function setdn($distinguishedNames)
     {
-        $this->dn = $dn;
+        $this->dn = $distinguishedNames;
     }
 
-     public function getName(): string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -35,7 +35,7 @@ class LdapEntryDTO
         $this->attributes = $attributes;
     }
 
-     public function getAttributes(): array
+    public function getAttributes(): array
     {
         return $this->attributes;
     }

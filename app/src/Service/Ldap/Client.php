@@ -190,8 +190,11 @@ class Client
      *
      * @psalm-return CollectionInterface|array<array-key, Entry>
      */
-    public function search(string $query, string $baseDn = null, array $options = ['scope' => QueryInterface::SCOPE_SUB])
-    {
+    public function search(
+        string $query,
+        string $baseDn = null,
+        array $options = ['scope' => QueryInterface::SCOPE_SUB]
+    ) {
         $searchOptions = array_merge(
             ['scope' => QueryInterface::SCOPE_SUB],
             $options

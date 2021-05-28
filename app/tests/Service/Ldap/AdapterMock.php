@@ -63,9 +63,9 @@ class AdapterMock implements AdapterInterface
     /**
      * {@inheritdoc}
      */
-    public function createQuery($dn, $query, array $options = [])
+    public function createQuery($distinguishedNames, $query, array $options = [])
     {
-        return new QueryMock($this->getConnection(), $dn, $query, $options);
+        return new QueryMock($this->getConnection(), $distinguishedNames, $query, $options);
     }
 
     /**

@@ -15,12 +15,12 @@ class QueryMock extends AbstractQuery
     /** @var array */
     private $results;
 
-    /** @var array */
-    private $serverctrls = [];
+    // /** @var array */
+    // private $serverctrls = [];
 
-    public function __construct(ConnectionMock $connection, string $dn, string $query, array $options = [])
+    public function __construct(ConnectionMock $connection, string $distinguishedNames, string $query, array $options = [])
     {
-        parent::__construct($connection, $dn, $query, $options);
+        parent::__construct($connection, $distinguishedNames, $query, $options);
     }
 
     public function __sleep()
@@ -35,7 +35,8 @@ class QueryMock extends AbstractQuery
 
     public function __destruct()
     {
-        $con = $this->connection->getResource();
+        //TODO verify that $con is useful for the test
+        // $con = $this->connection->getResource();
         $this->connection = null;
 
         if (null === $this->results) {
@@ -83,7 +84,7 @@ class QueryMock extends AbstractQuery
             } elseif (0 !== $maxItems) {
                 $pageSize = min($maxItems, $pageSize);
             }
-            $pageControl = $this->options['scope'] != static::SCOPE_BASE && $pageSize > 0;
+            // $pageControl = $this->options['scope'] != static::SCOPE_BASE && $pageSize > 0;
             $cookie = '';
             do {
                 $sizeLimit = $itemsLeft;
@@ -91,12 +92,22 @@ class QueryMock extends AbstractQuery
                     $sizeLimit = 0;
                 }
                 // TODO Define expected responses for tests
-                $search = $this->callSearchFunction($con, $func, $sizeLimit);
+                // TODO verify if $con and $sizeLimit is useful fot the test
+                // $search = $this->callSearchFunction($con, $func, $sizeLimit);
+                $search = $this->callSearchFunction($func);
 
                 if (false === $search) {
                     $ldapError = 'LDAP error';
 
-                    throw new LdapException(sprintf('Could not complete search with dn "%s", query "%s" and filters "%s".%s.', $this->dn, $this->query, implode(',', $this->options['filter']), $ldapError));
+                    throw new LdapException(
+                        sprintf(
+                            'Could not complete search with dn "%s", query "%s" and filters "%s".%s.',
+                            $this->dn,
+                            $this->query,
+                            implode(',', $this->options['filter']),
+                            $ldapError
+                        )
+                    );
                 }
 
                 $this->results[] = $search;
@@ -147,7 +158,7 @@ class QueryMock extends AbstractQuery
      *
      * @return array
      */
-    private function callSearchFunction($con, string $func, int $sizeLimit)
+    private function callSearchFunction(string $func)
     {
         // TODO Define expected responses for tests
         switch ($func) {

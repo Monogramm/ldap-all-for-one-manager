@@ -69,7 +69,8 @@ class LdapController extends AbstractController
         foreach ($ldapEntries as $key => $ldapEntry) {
             $entries[$key]['dn'] = $ldapEntry->getDn();
             // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
-            $ldapEntry = LdapEntryDTO::serializeJpegPhoto($ldapEntry);
+            $ldapDto = new LdapEntryDTO();
+            $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
 
             // Rely on filter option to filter attributes
             $entries[$key]['attributes'] = $ldapEntry->getAttributes();
@@ -109,7 +110,8 @@ class LdapController extends AbstractController
         }
 
         // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
-        $ldapEntry = LdapEntryDTO::serializeJpegPhoto($ldapEntry);
+        $ldapDto = new LdapEntryDTO();
+        $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
 
         $dto = $serializer->serialize($ldapEntry, 'json');
 
@@ -160,7 +162,7 @@ class LdapController extends AbstractController
         SerializerInterface $serializer
     ): JsonResponse {
         $query = $request->get('query', '(objectClass=*)');
-        dump($request);
+
         /**
          * @var Entry $dto
          */
@@ -211,17 +213,5 @@ class LdapController extends AbstractController
         }
 
         return JsonResponse::create($result, $status);
-    }
-
-    /**
-     * @Route("/api/admin/ldap/test", name="test_ldap_entry", methods={"PUT"})
-     *
-     * @return JsonResponse
-     */
-    public function testLdapEntry(): JsonResponse {
-
-        dump("TEST IS READY FOR DISPLAY");
-
-        return JsonResponse::create("TEST READY", 200);
     }
 }

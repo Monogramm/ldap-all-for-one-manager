@@ -35,8 +35,8 @@ class CollectionMock implements CollectionInterface
      */
     public function count()
     {
-        $con = $this->connection->getResource();
-        $searches = $this->search->getResources();
+        // $con = $this->connection->getResource();
+        // $searches = $this->search->getResources();
         $count = 1;
         /*
         foreach ($searches as $search) {
@@ -68,7 +68,7 @@ class CollectionMock implements CollectionInterface
         //     return;
         // }
 
-        $con = $this->connection->getResource();
+        //$con = $this->connection->getResource();
         $searches = $this->search->getResources();
 
         foreach ($searches as $search) {
@@ -77,8 +77,9 @@ class CollectionMock implements CollectionInterface
             if (false === $current) {
                 throw new LdapException('Could not rewind entries array: ');
             }
-
-            yield $this->getSingleEntry($con, $current);
+            //TODO verify that con is not useful for the test
+            //yield $this->getSingleEntry($con,$current);
+            yield $this->getSingleEntry($current);
         }
     }
 
@@ -114,7 +115,7 @@ class CollectionMock implements CollectionInterface
         unset($this->entries[$offset]);
     }
 
-    private function getSingleEntry($con, $current): Entry
+    private function getSingleEntry($current): Entry
     {
         //Check the depth of the array
         switch ($current) {
@@ -131,10 +132,10 @@ class CollectionMock implements CollectionInterface
         //Check the depth of the array
         switch ($current) {
             case isset($current[0]):
-                $dn = $current[0]['dn'];
+                $distinguishedNames = $current[0]['dn'];
                 break;
             case isset($current['dn']):
-                $dn = $current['dn'];
+                $distinguishedNames = $current['dn'];
                 break;
             default:
                 throw new LdapException('Could not fetch DN: ');
@@ -150,19 +151,6 @@ class CollectionMock implements CollectionInterface
         //     throw new LdapException('Could not fetch DN: ');
         // }
 
-        return new Entry($dn, $attributes);
-    }
-
-    private function cleanupAttributes(array $entry): array
-    {
-        $attributes = array_diff_key($entry, array_flip(range(0, $entry['count'] - 1)) + [
-                'count' => null,
-                'dn' => null,
-            ]);
-        array_walk($attributes, function (&$value) {
-            unset($value['count']);
-        });
-        
-        return $attributes;
+        return new Entry($distinguishedNames, $attributes);
     }
 }

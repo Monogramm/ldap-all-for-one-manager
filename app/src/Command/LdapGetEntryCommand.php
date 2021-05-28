@@ -104,11 +104,12 @@ class LdapGetEntryCommand extends Command
         $ldapEntry = $ldapClient->get($query, $entry, $options);
 
         if (! empty($ldapEntry)) {
-            // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
-            $ldapEntry = LdapEntryDTO::serializeJpegPhoto($ldapEntry);
+            $ldapEntryDto = new LdapEntryDTO();
 
+            $ldapEntry = $ldapEntryDto->serializeJpegPhoto($ldapEntry);
             // Manage output formats.
-            $outputEntry = LdapEntryDTO::serializeEntry($ldapEntry, $format);
+            $outputEntry = $ldapEntryDto->serializeEntry($ldapEntry, $format);
+
             $symfonyStyle->text($outputEntry);
 
             return 0;

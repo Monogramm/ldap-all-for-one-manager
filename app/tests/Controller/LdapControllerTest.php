@@ -102,6 +102,7 @@ class LdapControllerTest extends WebTestCase
     
     public function testEditLdapEntryByQuery()
     {
+        $uri = '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $this->serializer = new Serializer($normalizers, $encoders);
@@ -112,7 +113,7 @@ class LdapControllerTest extends WebTestCase
             ]
         ), 'json');
        
-        $this->client->request('PUT', '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com', [], [], [], $attr);
+        $this->client->request('PUT', $uri, [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);

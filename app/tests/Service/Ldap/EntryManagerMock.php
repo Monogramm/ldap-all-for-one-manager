@@ -22,7 +22,7 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function add(Entry $entry)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
@@ -84,14 +84,22 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function addAttributeValues(Entry $entry, string $attribute, array $values)
     {
-        $con = $this->getConnectionResource();
+        // $con = $this->getConnectionResource();
 
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
             case 'uid=exception':
-                throw new LdapException(sprintf('Could not add values to entry "%s", attribute "%s": ', $entry->getDn(), $attribute));
+                throw new LdapException(
+                    sprintf(
+                        'Could not add values to entry "%s", attribute "%s": ',
+                        $entry->getDn(),
+                        $attribute
+                    )
+                );
                 break;
-
+            case $values:
+                # code...
+                break;
             default:
                 # code...
                 break;
@@ -111,9 +119,17 @@ class EntryManagerMock implements EntryManagerInterface
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
             case 'uid=exception':
-                throw new LdapException(sprintf('Could not remove values from entry "%s", attribute "%s": ', $entry->getDn(), $attribute));
+                throw new LdapException(
+                    sprintf(
+                        'Could not remove values from entry "%s", attribute "%s": ',
+                        $entry->getDn(),
+                        $attribute
+                    )
+                );
                 break;
-
+            case $values:
+                # code...
+                break;
             default:
                 # code...
                 break;
@@ -180,7 +196,7 @@ class EntryManagerMock implements EntryManagerInterface
      *
      * @throws UpdateOperationException in case of an error
      */
-    public function applyOperations(string $dn, iterable $operations): void
+    public function applyOperations(string $distinguishedNames, iterable $operations): void
     {
         $operationsMapped = [];
         foreach ($operations as $modification) {
@@ -189,9 +205,15 @@ class EntryManagerMock implements EntryManagerInterface
 
         $con = $this->getConnectionResource();
         // TODO Define expected responses for tests
-        switch ($dn) {
+        switch ($distinguishedNames) {
             case 'uid=exception':
-                throw new UpdateOperationException(sprintf('Error executing UpdateOperation on "%s": "%s".', $dn, null));
+                throw new UpdateOperationException(
+                    sprintf(
+                        'Error executing UpdateOperation on "%s": "%s".',
+                        $distinguishedNames,
+                        null
+                    )
+                );
                 break;
 
             default:
