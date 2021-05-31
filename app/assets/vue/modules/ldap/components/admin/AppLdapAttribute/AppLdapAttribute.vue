@@ -4,41 +4,39 @@
     <!-- Name of the table-->
     <div class="columns is-justify-content-center">
       <h1 class="title">
-        {{ keyldap }}
+        {{ attributeKey }}
       </h1>
     </div>
     <template
-      v-for="(row, index) in entry.value"
+      v-for="(row, index) in attributeValues"
     >
       <div
         :key="`valueInput:${index}`"
         class="columns"
       >
-        <!-- Input value entry-->
+        <!-- Input value attribute-->
         <div class="column is-2">
           <h4 class="title is-4">
-            Value
+            {{ $t('ldap.entries.value') }}
           </h4>
         </div>
         <div class="column is-7">
           <b-input
-            v-model="entry.value[index]"
+            v-model="attributeValues[index]"
             type="text"
-            placeholder="ldap attribute in json format"
+            placeholder="ldap attribute"
           />
         </div>
         <div class="column is-3">
           <!-- Section for the input create/delete-->
           <div class="buttons">
             <b-button
-              v-show="index > 0"
               type="is-danger"
               icon-right="trash"
               @click="removeField(index)"
             />
             <b-button
-              v-show="lastItem() === index"
-              type="is-danger"
+              v-if="lastItem() === index"
               icon-right="plus"
               @click="addField()"
             />
@@ -53,13 +51,13 @@
 export default {
   name: "AppLdapAttribute",
   props: {
-    indexinput : {
-      type: Number,
-      default: 0
-    },
-    keyldap : {
+    keyLdap : {
       type: String,
-      default: ''
+      default: '',
+    },
+    value : {
+      type: Array,
+      default: [''],
     },
     isLoading: {
       type: Boolean,
@@ -68,21 +66,23 @@ export default {
   },
   data() {
     return {
-      entry: {key:this.keyldap,value:['']},
+      attribute: {keyLdap:this.keyLdap,value:[]},
+      attributeKey: this.keyLdap,
+      attributeValues: this.value
     };
   },
   methods: {
-    updateParent(property: string, value: string) {
-      this.$emit("updateParent", property, value);
+    updateParent(property: string, value: Array<String>) {
+      this.$emit("", property, value);
     },
     addField() {
-      this.entry.value.push('');
+      this.attributeValues.push('');
     },
     removeField(index: Number) {
-      this.entry.value.splice(index, 1);
+      this.attributeValues.splice(index, 1);
     },
     lastItem() {
-    	return this.entry.value.length-1;
+    	return this.attributeValues.length-1;
     }
   }
 };

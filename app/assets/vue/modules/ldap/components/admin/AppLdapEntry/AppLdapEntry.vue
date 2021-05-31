@@ -11,7 +11,7 @@
       <!-- Default DN input-->
       <b-field :label="$t('ldap.entries.dn')">
         <b-input
-          v-model="ldapEntry.dn"
+          v-model="dn"
           maxlength="254"
           required
           :disabled="isLoading"
@@ -98,7 +98,7 @@ export default {
   },
   data() {
     return {
-      inputarray: [{entry:''}],
+      dn: '',
     };
   },
   computed: {
@@ -112,7 +112,7 @@ export default {
     },
     submit() {
       this.$emit("submit");
-    },
+    }
   }
 };
 </script>

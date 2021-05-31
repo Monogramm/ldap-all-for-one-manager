@@ -1,11 +1,11 @@
 <template>
   <div class="section">
     <template
-      v-for="(row, index) in attributeArray"
+      v-for="(row, index) in appLdapAttributeArray"
     >
       <!-- Button for retrieving input-->
       <b-button
-        v-show="attributeArray.length > 1"
+        v-if="appLdapAttributeArray.length > 1"
         :key="`deletebutton:${index}`"
         @click="removeField(index)"
       >
@@ -14,21 +14,21 @@
 
       <!-- Call AppLdapAttribute Component-->
       <app-ldap-attribute
-        v-show="attributeArray != null"
+        v-if="appLdapAttributeArray[0] != null"
         :key="`componentldapattribute:${index}`"
-        :indexinput="index"
-        :keyldap="row"
+        :key-ldap="keyAttribute"
+        :value="attributeArray[index]"
       />
     </template>
 
     <div class="columns">
-      <!-- Input value key-->
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
         <b-field
           label="key" 
         >
+          <!-- Input value keyLdap-->
           <b-input
-            v-model="keyEntry"
+            v-model="keyAttribute"
             required
             placeholder="key for ldap attribute"
             type="text"
@@ -61,7 +61,6 @@ export default {
   props: {
     attributes: {
       type: Object,
-      default: () => Array<any>(),
     },
     isLoading: {
       type: Boolean,
@@ -70,8 +69,9 @@ export default {
   },
   data() {
     return {
-      keyEntry: '',
-      attributeArray: new Array,
+      keyAttribute: '',
+      attributeArray: [],
+      appLdapAttributeArray: new Array,
       rowNumber: 0
     };
   },
@@ -82,10 +82,11 @@ export default {
   },
   methods: {
     addField() {
-      this.attributeArray.push(this.keyEntry);
+      this.appLdapAttributeArray.push(this.rowNumber++);
+      this.attributeArray.push(['']);
     },
     removeField(index: Number) {
-      this.attributeArray.splice(index, 1);
+      this.appLdapAttributeArray.splice(index, 1);
     },
   }
 };
