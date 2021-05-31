@@ -10,6 +10,12 @@ use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 
+/**
+ * This will suppress all the PMD warnings in
+ * this class.
+ *
+ * @SuppressWarnings(PHPMD)
+ */
 class ClientMock extends Client
 {
     public const ADAPTER_TEST_CONFIG = array(

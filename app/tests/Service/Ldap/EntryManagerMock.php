@@ -8,6 +8,12 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 use Symfony\Component\Ldap\Exception\UpdateOperationException;
 
+/**
+ * This will suppress all the PMD warnings in
+ * this class.
+ *
+ * @SuppressWarnings(PHPMD)
+ */
 class EntryManagerMock implements EntryManagerInterface
 {
     private $connection;
@@ -178,18 +184,18 @@ class EntryManagerMock implements EntryManagerInterface
         }
     }
 
-    /**
-     * Get the connection resource, but first check if the connection is bound.
-     */
-    private function getConnectionResource()
-    {
-        // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
-        if (!$this->connection->isBound()) {
-            throw new NotBoundException('Query execution is not possible without binding the connection first.');
-        }
+    // /**
+    //  * Get the connection resource, but first check if the connection is bound.
+    //  */
+    // private function getConnectionResource()
+    // {
+    //     // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
+    //     if (!$this->connection->isBound()) {
+    //         throw new NotBoundException('Query execution is not possible without binding the connection first.');
+    //     }
 
-        return $this->connection->getResource();
-    }
+    //     return $this->connection->getResource();
+    // }
 
     /**
      * @param iterable|UpdateOperation[] $operations An array or iterable of UpdateOperation instances

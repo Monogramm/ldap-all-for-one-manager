@@ -11,6 +11,12 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * This will suppress all the PMD warnings in
+ * this class.
+ *
+ * @SuppressWarnings(PHPMD)
+ */
 class ConnectionMock extends AbstractConnection
 {
     private const LDAP_INVALID_CREDENTIALS = 0x31;
