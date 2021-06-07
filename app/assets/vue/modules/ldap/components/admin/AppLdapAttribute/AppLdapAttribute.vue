@@ -8,7 +8,7 @@
       </h1>
     </div>
     <template
-      v-for="(row, index) in attributeValues"
+      v-for="(row, index) in attributes"
     >
       <div
         :key="`valueInput:${index}`"
@@ -20,11 +20,12 @@
             {{ $t('ldap.entries.value') }}
           </h4>
         </div>
-        <div class="column is-7">
+        <div class="column is-7 mb-0">
           <b-input
-            v-model="attributeValues[index]"
+            v-model="attributes[index]"
+            :value="row"
             type="text"
-            placeholder="ldap attribute"
+            :placeholder="$t('ldap.entries.ldap-placeholder')"
           />
         </div>
         <div class="column is-3">
@@ -33,12 +34,12 @@
             <b-button
               type="is-danger"
               icon-right="trash"
-              @click="removeField(index)"
+              @click="removeInput(index)"
             />
             <b-button
-              v-if="lastItem() === index"
+              v-if="getLastItem() === index"
               icon-right="plus"
-              @click="addField()"
+              @click="addInput()"
             />
           </div>
         </div>
@@ -51,38 +52,30 @@
 export default {
   name: "AppLdapAttribute",
   props: {
-    keyLdap : {
+    keyAttribut : {
       type: String,
       default: '',
     },
     value : {
       type: Array,
-      default: [''],
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
+      default: () => Array<String>(),
     }
   },
   data() {
     return {
-      attribute: {keyLdap:this.keyLdap,value:[]},
-      attributeKey: this.keyLdap,
-      attributeValues: this.value
+      attributes: this.value,
+      attributeKey: this.keyAttribut,
     };
   },
   methods: {
-    updateParent(property: string, value: Array<String>) {
-      this.$emit("", property, value);
+    addInput() {
+      this.attributes.push('');
     },
-    addField() {
-      this.attributeValues.push('');
+    removeInput(index: number) {
+      this.attributes.splice(index, 1);
     },
-    removeField(index: Number) {
-      this.attributeValues.splice(index, 1);
-    },
-    lastItem() {
-    	return this.attributeValues.length-1;
+    getLastItem() {
+    	return this.attributes.length-1;
     }
   }
 };

@@ -254,7 +254,8 @@
       "attribute": "Attribut",
       "value": "Valeur",
       "description": "Description",
-      "add-a-attribute":"Ajouter un attribut"
+      "add-a-attribute":"Ajouter un attribut",
+      "ldap-placeholder":"ldap attribut"
     }
   },
   "background-jobs": {

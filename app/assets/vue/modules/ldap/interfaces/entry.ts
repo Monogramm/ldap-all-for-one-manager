@@ -46,10 +46,10 @@ export interface ILdapEntry extends IEntity {
  */
 export class LdapEntry extends Entity implements ILdapEntry {
   constructor(
-    dn: string,
+    dn : string,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
-    public attributes: ILdapAttributes = null,
+    public attributes: ILdapAttributes = {},
   ) {
     super(dn, createdAt, updatedAt);
   }

@@ -1,23 +1,21 @@
 <template>
   <div class="section">
     <template
-      v-for="(row, index) in appLdapAttributeArray"
+      v-for="(row, index) in attributes"
     >
       <!-- Button for retrieving input-->
       <b-button
-        v-if="appLdapAttributeArray.length > 1"
         :key="`deletebutton:${index}`"
         @click="removeField(index)"
       >
         {{ $t('common.delete') }}
       </b-button>
-
+      <!-- " -->
       <!-- Call AppLdapAttribute Component-->
       <app-ldap-attribute
-        v-if="appLdapAttributeArray[0] != null"
         :key="`componentldapattribute:${index}`"
-        :key-ldap="keyAttribute"
-        :value="attributeArray[index]"
+        :key-attribut="index"
+        :value="row"
       />
     </template>
 
@@ -53,40 +51,42 @@
 </template>
 
 <script lang="ts">
+import { ILdapAttributes, ILdapEntry, LdapEntry } from "../../../interfaces/entry";
 import AppLdapAttribute from "../../admin/AppLdapAttribute/AppLdapAttribute.vue";
+import { PropType } from 'vue';
 
 export default {
   name: "AppLdapAttributes",
   components: { AppLdapAttribute },
   props: {
-    attributes: {
-      type: Object,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
+    attributes : {
+      type: Object as PropType<ILdapAttributes>,
+      default: {},
     }
   },
   data() {
     return {
       keyAttribute: '',
-      attributeArray: [],
-      appLdapAttributeArray: new Array,
-      rowNumber: 0
+      //TODO Find why this.attributes made reference to the default object
+      appLdapAttributes: this.attributes,
     };
   },
   computed: {
     isEdit() {
       return !!this.ldapEntry.dn;
-    }
+    },
   },
   methods: {
-    addField() {
-      this.appLdapAttributeArray.push(this.rowNumber++);
-      this.attributeArray.push(['']);
+    updateAttribute() {
+      // this.$emit("updateAttribute","");
     },
-    removeField(index: Number) {
-      this.appLdapAttributeArray.splice(index, 1);
+    addField() {
+      this.attributes[this.keyAttribute] = [''];
+    },
+    removeField(index: string) {
+      //TODO Find a way 
+      delete this.attributes[index];
+      //this.attributes.splice(index, 1);
     },
   }
 };

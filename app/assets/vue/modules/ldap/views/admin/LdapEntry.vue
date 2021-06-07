@@ -34,9 +34,9 @@ export default {
       return !!this.id;
     }
   },
-  created() {
+  async created() {
     if (this.id) {
-      this.$store
+      await this.$store
         .dispatch("ldapEntry/get", this.id).then((result: ILdapEntry) => {
           this.entry = result;
         });
@@ -44,7 +44,7 @@ export default {
   },
   methods: {
     onChildPropsChanged(property: string, value: string) {
-      this.item[property] = value;
+      this.entry[property] = value;
     },
     async editLdapEntry(id: string, ldapEntry: ILdapEntry) {
       await this.$store
@@ -66,10 +66,10 @@ export default {
     },
     onSubmit() {
       if (this.isEdit) {
-        return this.editLdapEntry(this.id, this.item);
+        return this.editLdapEntry(this.id, this.entry);
       }
 
-      return this.createLdapEntry(this.item);
+      return this.createLdapEntry(this.entry);
     }
   }
 };

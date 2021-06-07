@@ -11,39 +11,17 @@
       <!-- Default DN input-->
       <b-field :label="$t('ldap.entries.dn')">
         <b-input
-          v-model="dn"
+          v-model="ldapEntry.dn"
           maxlength="254"
           required
           :disabled="isLoading"
-          @change="updateParent('dn', $event.target.value)"
         />
       </b-field>
-
-      <template v-if="isEdit">
-        <template v-for="(field, property) in ldapEntry.attributes">
-          <template v-for="(value,keyArray) in field">
-            <b-field
-              :key="'key'+property+keyArray"
-              :label="property"
-              :name="property+keyArray"
-            >
-              <b-input
-                :key="value+keyArray"
-                :value="value"
-                maxlength="254"
-                required
-                :disabled="isLoading"
-                @change="updateParent('attributes', $event.target.value)"
-              />
-            </b-field>
-          </template>
-        </template>
-      </template>
-
-      <!-- show in case of edit-->
-      <template v-else>
-        <app-ldap-attributes :attributes="ldapEntry.attributes" />
-      </template>
+      <!-- Call the AppLdapAttributes Component-->
+      <app-ldap-attributes
+        :attributes="ldapEntry.attributes"
+        @updateAttribute="updateAttribute"
+      />
 
       <!--
       <b-field :label="$t('ldap.entries.attribute')">
@@ -89,7 +67,7 @@ export default {
   props: {
     ldapEntry: {
       type: Object,
-      default: () => new LdapEntry(null)
+      default: () => new LdapEntry(null,null)
     },
     isLoading: {
       type: Boolean,
@@ -98,7 +76,8 @@ export default {
   },
   data() {
     return {
-      dn: '',
+      //TODO Find why this.ldapEntry made reference to the default object
+      newEntry: this.ldapEntry,
     };
   },
   computed: {
@@ -107,10 +86,13 @@ export default {
     }
   },
   methods: {
-    updateParent(property: string, value: string) {
-      this.$emit("updateParent", property, value);
+    updateAttribute(attribute: Array<String>) {
+      console.log("Update")
+      this.newEntry.attributes = attribute;
     },
     submit() {
+      this.newEntry.dn = "cn=Sika Dore,ou=people,dc=planetexpress,dc=com"
+      this.newEntry.attributes = {sn:["Jojo"],objectClass:["inetOrgPerson"]}
       this.$emit("submit");
     }
   }
