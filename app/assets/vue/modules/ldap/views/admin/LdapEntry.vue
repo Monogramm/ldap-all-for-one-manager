@@ -1,5 +1,6 @@
 <template>
   <app-ldapEntry
+    v-if="entry !== null"
     :ldap-entry="entry"
     :is-loading="isLoading"
     @updateParent="onChildPropsChanged"
@@ -24,7 +25,7 @@ export default {
   },
   data() {
     return {
-      entry: new LdapEntry(null) as ILdapEntry
+      entry: null
     };
   },
   computed: {
@@ -40,6 +41,8 @@ export default {
         .dispatch("ldapEntry/get", this.id).then((result: ILdapEntry) => {
           this.entry = result;
         });
+    } else {
+      this.entry = LdapEntryDefault();
     }
   },
   methods: {

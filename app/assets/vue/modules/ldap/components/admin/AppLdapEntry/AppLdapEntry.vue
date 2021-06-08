@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { ILdapEntry, LdapEntry } from "../../../interfaces/entry";
+import { ILdapEntry, LdapEntry, LdapEntryDefault } from "../../../interfaces/entry";
 import AppLdapAttributes from "../../admin/AppLdapAttributes/AppLdapAttributes.vue";
 
 export default {
@@ -67,7 +67,7 @@ export default {
   props: {
     ldapEntry: {
       type: Object,
-      default: () => new LdapEntry(null,null)
+      default: LdapEntryDefault
     },
     isLoading: {
       type: Boolean,

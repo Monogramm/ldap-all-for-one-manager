@@ -79,5 +79,5 @@ export class LdapEntry extends Entity implements ILdapEntry {
  * Factory to generate new default LdapEntry class.
  */
 export const LdapEntryDefault = (): LdapEntry => {
-  return new LdapEntry("uid=");
+  return new LdapEntry(null);
 };
