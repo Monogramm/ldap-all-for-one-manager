@@ -1,22 +1,30 @@
 <template>
-  <div class="section">
+  <div>
     <template
-      v-for="(row, index) in attributes"
+      v-for="(row, index) in parentAttributes"
+      class="container"
     >
-      <!-- Button for retrieving input-->
-      <b-button
-        :key="`deletebutton:${index}`"
-        @click="removeField(index)"
+      <div
+        :key="`div:${index}`"
+        class="box"
       >
-        {{ $t('common.delete') }}
-      </b-button>
-      <!-- " -->
-      <!-- Call AppLdapAttribute Component-->
-      <app-ldap-attribute
-        :key="`componentldapattribute:${index}`"
-        :key-attribut="index"
-        :value="row"
-      />
+        <!-- Button for retrieving input-->
+        <div class="columns is-centered">
+          <div class="column is-1">
+            <b-button
+              type="is-danger"
+              icon-right="trash"
+              @click="removeInput(index)"
+            />
+          </div>
+        </div>
+        <!-- Call AppLdapAttribute Component-->
+        <app-ldap-attribute
+          :key="`componentldapattribute:${index}`"
+          :key-attribut="index"
+          :value="row"
+        />
+      </div>
     </template>
 
     <div class="columns">
@@ -33,21 +41,21 @@
           />
         </b-field>
         <b-button
-          @click="addField()"
+          @click="addInput()"
         >
           {{ $t('ldap.entries.add-a-attribute') }}
         </b-button>
       </div>
     </div>
-  </div>
        
-  <!-- <template
+    <!-- <template
     v-for="(key, value) in attributes"
     :key="key"
     :value="value"
   >
     <app-ldap-attribute />
   </template> -->
+  </div>
 </template>
 
 <script lang="ts">
@@ -67,25 +75,21 @@ export default {
   data() {
     return {
       keyAttribute: '',
-      //TODO Find why this.attributes made reference to the default object
-      appLdapAttributes: this.attributes,
+      parentAttributes: this.attributes,
+      appLdapAttribute: []
     };
-  },
-  computed: {
-    isEdit() {
-      return !!this.ldapEntry.dn;
-    },
   },
   methods: {
     updateAttribute() {
-      // this.$emit("updateAttribute","");
+      //TODO Find if that funtion is useful
     },
-    addField() {
-      this.attributes[this.keyAttribute] = [''];
+    addInput() {
+      //this.parentAttributes[this.keyAttribute] = [''];
+      this.$set(this.parentAttributes,this.keyAttribute,[''])
     },
-    removeField(index: string) {
-      //TODO Find a way 
-      delete this.attributes[index];
+    removeInput(index: string) {
+      this.$delete(this.parentAttributes,index)
+      //delete this.parentAttributes[index];
       //this.attributes.splice(index, 1);
     },
   }

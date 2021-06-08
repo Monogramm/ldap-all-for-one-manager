@@ -154,6 +154,7 @@ class LdapController extends AbstractController
      * @return JsonResponse
      */
     public function editLdapEntryByQuery(
+        string $fullDN,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
@@ -168,7 +169,7 @@ class LdapController extends AbstractController
             'json'
         );
         // TODO Deserialize from base64 jpegPhoto.
-        $fullDN = $dto->getDn();
+        // $fullDN = $dto->getDn();
         try {
             $ldap->bind();
 

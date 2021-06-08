@@ -20,7 +20,7 @@ class LdapEntryDTO
      */
     public $attributes;
 
-    public function setdn($distinguishedNames)
+    public function setdn($distinguishedNames): void
     {
         $this->dn = $distinguishedNames;
     }
@@ -30,7 +30,7 @@ class LdapEntryDTO
         return $this->name;
     }
 
-    public function setAttributes($attributes)
+    public function setAttributes($attributes): void
     {
         $this->attributes = $attributes;
     }
@@ -40,6 +40,9 @@ class LdapEntryDTO
         return $this->attributes;
     }
 
+    /**
+     * @return false|string
+     */
     public static function serializeEntry(Entry $ldapEntry, string $format)
     {
         $outputEntry = '';
@@ -70,7 +73,7 @@ class LdapEntryDTO
         return $outputEntry;
     }
 
-    public static function serializeJpegPhoto(Entry $ldapEntry)
+    public static function serializeJpegPhoto(Entry $ldapEntry): Entry
     {
         // Serialize in base64 jpegPhoto.
         if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {

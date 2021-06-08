@@ -11,7 +11,7 @@
       <!-- Default DN input-->
       <b-field :label="$t('ldap.entries.dn')">
         <b-input
-          v-model="ldapEntry.dn"
+          v-model="newEntry.dn"
           maxlength="254"
           required
           :disabled="isLoading"
@@ -19,32 +19,10 @@
       </b-field>
       <!-- Call the AppLdapAttributes Component-->
       <app-ldap-attributes
-        :attributes="ldapEntry.attributes"
+        :attributes="newEntry.attributes"
         @updateAttribute="updateAttribute"
       />
-
-      <!--
-      <b-field :label="$t('ldap.entries.attribute')">
-        <b-input
-          v-model="ldapEntry.attributes"
-          maxlength="254"
-          required
-          :disabled="isLoading"
-          @change="updateParent('name', $event.target.value)"
-        />
-      </b-field>
-
-      <b-field :label="$t('ldap.entries.value')">
-        <b-input
-          v-model="ldapEntry.value"
-          maxlength="254"
-          required
-          :disabled="isLoading"
-          @change="updateParent('value', $event.target.value)"
-        />
-      </b-field>
-      -->
-
+      <!-- Button submit call onSubmit() from parent-->
       <b-button
         type="is-primary"
         native-type="submit"
@@ -82,17 +60,14 @@ export default {
   },
   computed: {
     isEdit() {
-      return !!this.ldapEntry.dn;
+      return !!this.ldapEntry.id;
     }
   },
   methods: {
-    updateAttribute(attribute: Array<String>) {
-      console.log("Update")
-      this.newEntry.attributes = attribute;
+    updateAttribute(attribute: Object) {
+      //TODO Find if that funtion is useful
     },
     submit() {
-      this.newEntry.dn = "cn=Sika Dore,ou=people,dc=planetexpress,dc=com"
-      this.newEntry.attributes = {sn:["Jojo"],objectClass:["inetOrgPerson"]}
       this.$emit("submit");
     }
   }

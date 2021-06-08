@@ -46,21 +46,23 @@ export interface ILdapEntry extends IEntity {
  */
 export class LdapEntry extends Entity implements ILdapEntry {
   constructor(
+    id : string,
     dn : string,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
     public attributes: ILdapAttributes = {},
   ) {
-    super(dn, createdAt, updatedAt);
+    super(id, dn, createdAt, updatedAt);
   }
 
-  get dn(): string {
-    return this.id;
-  }
+  //Ask for the use of the getter and setter
+  // get dn(): string {
+  //   return this.id;
+  // }
 
-  set dn(dn: string) {
-    this.id = dn;
-  }
+  // set dn(dn: string) {
+  //   this.dn = dn;
+  // }
 
   getAttribute(name: string): Array<any> {
     return this.attributes[name] ?? null;
@@ -79,5 +81,5 @@ export class LdapEntry extends Entity implements ILdapEntry {
  * Factory to generate new default LdapEntry class.
  */
 export const LdapEntryDefault = (): LdapEntry => {
-  return new LdapEntry(null);
+  return new LdapEntry(null,null);
 };

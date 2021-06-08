@@ -1,6 +1,6 @@
 <!-- Component responsible for the creation of inputs-->
 <template>
-  <div class="section">
+  <div class="mb-5">
     <!-- Name of the table-->
     <div class="columns is-justify-content-center">
       <h1 class="title">
