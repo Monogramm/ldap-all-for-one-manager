@@ -45,14 +45,14 @@ export interface ILdapEntry extends IEntity {
  * LDAP Entry class.
  */
 export class LdapEntry extends Entity implements ILdapEntry {
+  public dn: string = "";
   constructor(
     id : string,
-    dn : string,
     createdAt: Date = new Date(),
     updatedAt: Date = new Date(),
     public attributes: ILdapAttributes = {},
   ) {
-    super(id, dn, createdAt, updatedAt);
+    super(id, createdAt, updatedAt);
   }
 
   //Ask for the use of the getter and setter

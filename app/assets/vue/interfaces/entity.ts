@@ -3,7 +3,6 @@
  */
 export interface IEntity {
   id: string;
-  dn: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,7 +13,6 @@ export interface IEntity {
 export abstract class Entity implements IEntity {
   constructor(
       public id: string = '',
-      public dn: string = '',
       public createdAt: Date = new Date(),
       public updatedAt: Date = new Date(),
   ) {}
