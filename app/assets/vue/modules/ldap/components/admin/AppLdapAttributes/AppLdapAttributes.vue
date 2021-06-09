@@ -1,7 +1,7 @@
 <template>
   <div>
     <template
-      v-for="(row, index) in parentAttributes"
+      v-for="(row, index) in attributes"
       class="container"
     >
       <div
@@ -14,7 +14,7 @@
             <b-button
               type="is-danger"
               icon-right="trash"
-              @click="removeInput(index)"
+              @click="removeAttribute(index)"
             />
           </div>
         </div>
@@ -32,16 +32,16 @@
         <b-field
           label="key" 
         >
-          <!-- Input value keyLdap-->
           <b-input
-            v-model="keyAttribute"
+            v-model="newAttributeKey"
             required
             placeholder="key for ldap attribute"
             type="text"
           />
         </b-field>
+
         <b-button
-          @click="addInput()"
+          @click="addAttribute()"
         >
           {{ $t('ldap.entries.add-a-attribute') }}
         </b-button>
@@ -59,38 +59,34 @@
 </template>
 
 <script lang="ts">
-import { ILdapAttributes, ILdapEntry, LdapEntry } from "../../../interfaces/entry";
-import AppLdapAttribute from "../../admin/AppLdapAttribute/AppLdapAttribute.vue";
 import { PropType } from 'vue';
+
+import { ILdapAttributes, ILdapEntry, LdapEntry } from "../../../interfaces/entry";
+
+import AppLdapAttribute from "../../admin/AppLdapAttribute/AppLdapAttribute.vue";
 
 export default {
   name: "AppLdapAttributes",
   components: { AppLdapAttribute },
   props: {
-    attributes : {
+    values : {
       type: Object as PropType<ILdapAttributes>,
       default: {},
     }
   },
   data() {
     return {
-      keyAttribute: '',
-      parentAttributes: this.attributes,
-      appLdapAttribute: []
+      newAttributeKey: '',
+      attributes: this.values,
     };
   },
   methods: {
-    updateAttribute() {
-      //TODO Find if that funtion is useful
+    addAttribute() {
+      // XXX Remove default empty string as first value when LDAP schema config available.
+      this.$set(this.parentAttributes, this.newAttributeKey, ['']);
     },
-    addInput() {
-      //this.parentAttributes[this.keyAttribute] = [''];
-      this.$set(this.parentAttributes,this.keyAttribute,[''])
-    },
-    removeInput(index: string) {
-      this.$delete(this.parentAttributes,index)
-      //delete this.parentAttributes[index];
-      //this.attributes.splice(index, 1);
+    removeAttribute(index: string) {
+      this.$delete(this.parentAttributes, index);
     },
   }
 };

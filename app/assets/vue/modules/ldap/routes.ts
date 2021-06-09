@@ -13,6 +13,10 @@ export const LdapEntryRoutes: RouteConfig[] = [
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
+      adminDashboard: {
+        label: "ldap.entries.admin",
+        icon: "users",
+      },
     },
   },
   {

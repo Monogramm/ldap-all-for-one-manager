@@ -19,8 +19,7 @@
       </b-field>
       <!-- Call the AppLdapAttributes Component-->
       <app-ldap-attributes
-        :attributes="newEntry.attributes"
-        @updateAttribute="updateAttribute"
+        :values="newEntry.attributes"
       />
       <!-- Button submit call onSubmit() from parent-->
       <b-button
