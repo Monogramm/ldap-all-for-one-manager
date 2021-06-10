@@ -5,14 +5,14 @@
       class="container"
     >
       <div
-        :key="`div:${index}`"
+        :key="`divBoucleAttributes:${index}`"
         class="box"
       >
         <!-- Button for retrieving input-->
-        <div class="columns mt-2">
+        <div class="columns mt-2 is-mobile">
           <!-- Name of the table-->
-          <div class="ml-6 is-flex">
-            <h1 class="title has-text-centered">
+          <div class="ml-4 is-align-items-center is-flex">
+            <h1 class="title has-text-centered is-size-4-mobile">
               {{ index }}
             </h1>
           </div>
@@ -26,17 +26,16 @@
         </div>
         <!-- Call AppLdapAttribute Component-->
         <app-ldap-attribute
-          :key="`componentldapattribute:${index}`"
-          :key-attribut="index"
+          :key="`componentLdapattribute:${index}`"
           :value="row"
         />
       </div>
     </template>
 
-    <div class="columns">
+    <div class="columns is mobile">
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
         <b-field
-          :label="$t('ldap.entries.key')" 
+          :label="$t('ldap.entries.label-key')" 
         >
           <b-input
             v-model="newAttributeKey"
@@ -49,7 +48,7 @@
         <b-button
           @click="addAttribute()"
         >
-          {{ $t('ldap.entries.add-a-attribute') }}
+          {{ $t('ldap.entries.button-add-a-attribute') }}
         </b-button>
       </div>
     </div>

@@ -252,13 +252,11 @@
       "edit": "Modification d'une entrée LDAP",
       "create": "Création d'une entrée LDAP",
       "dn": "Nom distinctif",
-      "key":"Nom de l'attribut ",
+      "label-key":"Nom du nouvelle attribut ",
       "example-input": "Exemple : sn",
-      "attribute": "Attribut",
-      "value": "Valeur",
       "description": "Description",
-      "add-a-attribute":"Ajouter un attribut",
-      "ldap-placeholder":"ldap attribut"
+      "button-add-a-attribute": "Ajouter un attribut",
+      "ldap-placeholder": "ldap attribut"
     }
   },
   "background-jobs": {

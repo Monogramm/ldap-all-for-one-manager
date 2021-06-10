@@ -6,7 +6,7 @@
     >
       <div
         :key="`divColumns:${index}`"
-        class="columns mb-0"
+        class="columns mb-0 is-mobile"
       >
         <div
           :key="`divValueInput:${index}`"
@@ -27,7 +27,7 @@
         >
           <!-- Section for the input create/delete-->
           <b-button
-            :key="`valueInputs:${index}`"
+            :key="`valueRemoveInput:${index}`"
             type="is-danger"
             icon-right="trash"
             @click="removeInput(index)"
@@ -36,7 +36,7 @@
       </div>
     </template>
     <div
-      class="columns"
+      class="columns is-mobile"
     >
       <div class="column is-three-fifths is-offset-one-fifth" />
       <div class="column is-2 pl-0">
@@ -53,10 +53,6 @@
 export default {
   name: "AppLdapAttribute",
   props: {
-    keyAttribut : {
-      type: String,
-      default: '',
-    },
     value : {
       type: Array,
       default: () => Array<String>(),
@@ -65,7 +61,6 @@ export default {
   data() {
     return {
       attributes: this.value,
-      attributeKey: this.keyAttribut,
     };
   },
   methods: {

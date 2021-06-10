@@ -15,7 +15,7 @@ export class LdapEntryState extends AbstractEntityState<ILdapEntry>
   api = LdapEntryAPI.Instance;
 
   initCurrent(): ILdapEntry {
-    return new LdapEntry(null);
+    return new LdapEntry(null,null);
   }
 }
 

@@ -1,10 +1,9 @@
 <template>
   <app-ldapEntry
     v-if="entry !== null"
-    :id="this.id"
+    :id="id"
     :ldap-entry="entry"
     :is-loading="isLoading"
-    @updateParent="onChildPropsChanged"
     @submit="onSubmit"
   />
 </template>
@@ -26,7 +25,7 @@ export default {
   },
   data() {
     return {
-      entry: null
+      entry: null as LdapEntry | null
     };
   },
   computed: {

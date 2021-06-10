@@ -152,7 +152,7 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/admin/ldap", name="edit_ldap_entry", methods={"PUT"})
+     * @Route("/api/admin/ldap/{fullDN}", name="edit_ldap_entry", methods={"PUT"})
      *
      * @return JsonResponse
      */

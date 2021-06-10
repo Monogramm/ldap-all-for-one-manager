@@ -12,7 +12,7 @@
         <div class="column is-10">
           <h1
             v-if="isEdit"
-            class="title is-3"
+            class="title is-3 is-size-4-mobile"
           >
             {{ newEntry.dn }}
           </h1>
@@ -20,7 +20,6 @@
             <!-- Default DN input-->
             <b-field :label="$t('ldap.entries.dn')">
               <b-input
-              
                 v-model="newEntry.dn"
                 maxlength="254"
                 required
@@ -35,15 +34,17 @@
       <app-ldap-attributes
         :values="newEntry.attributes"
       />
-      <!-- Button submit call onSubmit() from parent-->
-      <b-button
-        type="is-primary"
-        native-type="submit"
-        :loading="isLoading"
-        @click="submit"
-      >
-        {{ $t(isEdit ? 'common.edit' : 'common.create') }}
-      </b-button>
+      <div class="columns is-centered is-mobile mt-5">
+        <!-- Button submit call onSubmit() from parent-->
+        <b-button
+          type="is-primary"
+          native-type="submit"
+          :loading="isLoading"
+          @click="submit"
+        >
+          {{ $t(isEdit ? 'common.edit' : 'common.create') }}
+        </b-button>
+      </div>
     </form>
   </div>
 </template>
@@ -71,7 +72,6 @@ export default {
   },
   data() {
     return {
-      //TODO Find why this.ldapEntry made reference to the default object
       newEntry: this.ldapEntry,
     };
   },
@@ -81,9 +81,6 @@ export default {
     }
   },
   methods: {
-    updateAttribute(attribute: Object) {
-      //TODO Find if that funtion is useful
-    },
     submit() {
       this.$emit("submit");
     }
