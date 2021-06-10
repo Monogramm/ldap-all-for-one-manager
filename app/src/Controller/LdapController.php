@@ -98,6 +98,8 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
+        $jsonResponse = new JsonResponse();
+
         $query = $request->get('query', '(objectClass=*)');
         // TODO Add attributes option.
         $options = $request->get('options', []);
@@ -106,7 +108,7 @@ class LdapController extends AbstractController
         $ldapEntry = $ldap->get($query, $entry, $options);
         if (empty($ldapEntry)) {
             // TODO Return translated error message.
-            return JsonResponse::create(null, 404);
+            return $jsonResponse->create(null, 404);
         }
 
         // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
@@ -115,7 +117,7 @@ class LdapController extends AbstractController
 
         $dto = $serializer->serialize($ldapEntry, 'json');
 
-        return JsonResponse::fromJsonString($dto);
+        return $jsonResponse->fromJsonString($dto);
     }
 
     /**
@@ -133,28 +135,28 @@ class LdapController extends AbstractController
             Entry::class,
             'json'
         );
+        $jsonResponse = new JsonResponse();
         // TODO Deserialize from base64 jpegPhoto.
         try {
             // TODO Check result.
             $ldap->bind();
             $result = $ldap->create($dto->getDn(), $dto->getAttributes());
-
-            return JsonResponse::fromJsonString(
+            
+            return $jsonResponse->fromJsonString(
                 $serializer->serialize($result, 'json')
             );
         } catch (LdapException $exception) {
             // TODO Log the exception.
-            return JsonResponse::create($exception->getMessage(), 500);
+            return $jsonResponse->create($exception->getMessage(), 500);
         }
     }
 
     /**
-     * @Route("/api/admin/ldap/{fullDN}", name="edit_ldap_entry", methods={"PUT"})
+     * @Route("/api/admin/ldap", name="edit_ldap_entry", methods={"PUT"})
      *
      * @return JsonResponse
      */
     public function editLdapEntryByQuery(
-        string $fullDN,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
@@ -169,22 +171,23 @@ class LdapController extends AbstractController
             'json'
         );
         // TODO Deserialize from base64 jpegPhoto.
-        // $fullDN = $dto->getDn();
+        $fullDN = $dto->getDn();
+        $jsonResponse = new JsonResponse();
         try {
             $ldap->bind();
 
             // TODO Check result.
             if ($result = $ldap->update($fullDN, $query, $dto->getAttributes()) === true) {
-                return JsonResponse::fromJsonString(
+                return $jsonResponse->fromJsonString(
                     $serializer->serialize($result, 'json')
                 );
             };
 
             //TODO MODIFY DEFAULT RETURN
-            return JsonResponse::create($result, 500);
+            return $jsonResponse->create($result, 500);
         } catch (LdapException $exception) {
             // TODO Log the exception.
-            return JsonResponse::create($exception->getMessage(), 500);
+            return $jsonResponse->create($exception->getMessage(), 500);
         }
     }
 
@@ -199,6 +202,7 @@ class LdapController extends AbstractController
     ): JsonResponse {
         $result = false;
         $status = 400;
+        $jsonResponse = new JsonResponse();
         try {
             $ldap->bind();
             $result = $ldap->delete($fullDn);
@@ -209,6 +213,6 @@ class LdapController extends AbstractController
             $status = 500;
         }
 
-        return JsonResponse::create($result, $status);
+        return $jsonResponse->create($result, $status);
     }
 }

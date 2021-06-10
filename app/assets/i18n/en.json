@@ -247,14 +247,17 @@
   },
   "ldap": {
     "entries": {
+      "admin": "LDAP Entries",
       "list": "LDAP Entries List",
       "edit": "Edit LDAP Entry",
       "create": "Create LDAP Entry",
       "dn": "Distinguished Name",
+      "key":"Attribute name",
+      "example-input": "Example : sn",
       "attribute": "Attribute",
       "value": "Value",
       "description": "Description",
-      "add-a-attribute":"Add a attribue",
+      "add-a-attribute":"Add an attribute",
       "ldap-placeholder":"ldap attribut"
     }
   },

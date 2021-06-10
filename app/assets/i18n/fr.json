@@ -247,10 +247,13 @@
   },
   "ldap": {
     "entries": {
+      "admin": "Entrées Ldap",
       "list": "Liste des entrées LDAP",
       "edit": "Modification d'une entrée LDAP",
       "create": "Création d'une entrée LDAP",
       "dn": "Nom distinctif",
+      "key":"Nom de l'attribut ",
+      "example-input": "Exemple : sn",
       "attribute": "Attribut",
       "value": "Valeur",
       "description": "Description",

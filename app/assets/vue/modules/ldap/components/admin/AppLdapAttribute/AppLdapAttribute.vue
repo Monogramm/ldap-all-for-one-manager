@@ -1,50 +1,51 @@
 <!-- Component responsible for the creation of inputs-->
 <template>
-  <div class="mb-5">
-    <!-- Name of the table-->
-    <div class="columns is-justify-content-center">
-      <h1 class="title">
-        {{ attributeKey }}
-      </h1>
-    </div>
+  <div class="mb-2">
     <template
       v-for="(row, index) in attributes"
     >
       <div
-        :key="`valueInput:${index}`"
-        class="columns"
+        :key="`divColumns:${index}`"
+        class="columns mb-0"
       >
-        <!-- Input value attribute-->
-        <div class="column is-2">
-          <h4 class="title is-4">
-            {{ $t('ldap.entries.value') }}
-          </h4>
-        </div>
-        <div class="column is-7 mb-0">
+        <div
+          :key="`divValueInput:${index}`"
+          class="column is-three-fifths is-offset-one-fifth"
+        >
+          <!-- Input value attribute-->
           <b-input
+            :key="`valueInput:${index}`"
             v-model="attributes[index]"
             :value="row"
             type="text"
             :placeholder="$t('ldap.entries.ldap-placeholder')"
           />
         </div>
-        <div class="column is-3">
+        <div
+          :key="`divDeleteButton:${index}`"
+          class="column is-2 pl-0"
+        >
           <!-- Section for the input create/delete-->
-          <div class="buttons">
-            <b-button
-              type="is-danger"
-              icon-right="trash"
-              @click="removeInput(index)"
-            />
-            <b-button
-              v-if="getLastItem() === index"
-              icon-right="plus"
-              @click="addInput()"
-            />
-          </div>
+          <b-button
+            :key="`valueInputs:${index}`"
+            type="is-danger"
+            icon-right="trash"
+            @click="removeInput(index)"
+          />
         </div>
       </div>
     </template>
+    <div
+      class="columns"
+    >
+      <div class="column is-three-fifths is-offset-one-fifth" />
+      <div class="column is-2 pl-0">
+        <b-button
+          icon-right="plus"
+          @click="addInput()"
+        />
+      </div>
+    </div>
   </div>
 </template>
 

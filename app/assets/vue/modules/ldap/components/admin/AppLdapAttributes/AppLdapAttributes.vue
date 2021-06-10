@@ -9,7 +9,13 @@
         class="box"
       >
         <!-- Button for retrieving input-->
-        <div class="columns is-centered">
+        <div class="columns mt-2">
+          <!-- Name of the table-->
+          <div class="ml-6 is-flex">
+            <h1 class="title has-text-centered">
+              {{ index }}
+            </h1>
+          </div>
           <div class="column is-1">
             <b-button
               type="is-danger"
@@ -30,12 +36,12 @@
     <div class="columns">
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
         <b-field
-          label="key" 
+          :label="$t('ldap.entries.key')" 
         >
           <b-input
             v-model="newAttributeKey"
             required
-            placeholder="key for ldap attribute"
+            :placeholder="$t('ldap.entries.example-input')"
             type="text"
           />
         </b-field>
@@ -47,14 +53,6 @@
         </b-button>
       </div>
     </div>
-       
-    <!-- <template
-    v-for="(key, value) in attributes"
-    :key="key"
-    :value="value"
-  >
-    <app-ldap-attribute />
-  </template> -->
   </div>
 </template>
 
@@ -83,10 +81,10 @@ export default {
   methods: {
     addAttribute() {
       // XXX Remove default empty string as first value when LDAP schema config available.
-      this.$set(this.parentAttributes, this.newAttributeKey, ['']);
+      this.$set(this.attributes, this.newAttributeKey, ['']);
     },
     removeAttribute(index: string) {
-      this.$delete(this.parentAttributes, index);
+      this.$delete(this.attributes, index);
     },
   }
 };

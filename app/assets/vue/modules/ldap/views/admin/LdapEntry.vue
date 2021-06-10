@@ -1,6 +1,7 @@
 <template>
   <app-ldapEntry
     v-if="entry !== null"
+    :id="this.id"
     :ldap-entry="entry"
     :is-loading="isLoading"
     @updateParent="onChildPropsChanged"

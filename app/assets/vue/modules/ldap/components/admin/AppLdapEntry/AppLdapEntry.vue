@@ -8,15 +8,29 @@
       class="box"
       @submit.prevent
     >
-      <!-- Default DN input-->
-      <b-field :label="$t('ldap.entries.dn')">
-        <b-input
-          v-model="newEntry.dn"
-          maxlength="254"
-          required
-          :disabled="isLoading"
-        />
-      </b-field>
+      <div class="columns mt-1 is-centered">
+        <div class="column is-10">
+          <h1
+            v-if="isEdit"
+            class="title is-3"
+          >
+            {{ newEntry.dn }}
+          </h1>
+          <div v-else>
+            <!-- Default DN input-->
+            <b-field :label="$t('ldap.entries.dn')">
+              <b-input
+              
+                v-model="newEntry.dn"
+                maxlength="254"
+                required
+                :disabled="isLoading"
+              />
+            </b-field>
+          </div>
+        </div>
+      </div>
+
       <!-- Call the AppLdapAttributes Component-->
       <app-ldap-attributes
         :values="newEntry.attributes"
@@ -46,6 +60,10 @@ export default {
       type: Object,
       default: LdapEntryDefault
     },
+    id: {
+      type: String,
+      default: ''
+    },
     isLoading: {
       type: Boolean,
       default: false
@@ -59,7 +77,7 @@ export default {
   },
   computed: {
     isEdit() {
-      return !!this.ldapEntry.id;
+      return !!this.id;
     }
   },
   methods: {
