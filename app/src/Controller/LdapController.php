@@ -64,7 +64,6 @@ class LdapController extends AbstractController
 
         $total = count($ldapEntries);
 
-        
         $entries = array();
         foreach ($ldapEntries as $key => $ldapEntry) {
             $entries[$key]['dn'] = $ldapEntry->getDn();
@@ -136,6 +135,7 @@ class LdapController extends AbstractController
             'json'
         );
         $jsonResponse = new JsonResponse();
+
         // TODO Deserialize from base64 jpegPhoto.
         try {
             // TODO Check result.
@@ -157,6 +157,7 @@ class LdapController extends AbstractController
      * @return JsonResponse
      */
     public function editLdapEntryByQuery(
+        string $fullDN,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
@@ -171,7 +172,6 @@ class LdapController extends AbstractController
             'json'
         );
         // TODO Deserialize from base64 jpegPhoto.
-        $fullDN = $dto->getDn();
         $jsonResponse = new JsonResponse();
         try {
             $ldap->bind();

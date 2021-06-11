@@ -3,12 +3,7 @@
 namespace App\Tests\Service\Ldap;
 
 use App\Service\Ldap\Client;
-use Symfony\Component\Ldap\Entry;
-use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Ldap;
-use Symfony\Component\Ldap\LdapInterface;
-use Symfony\Component\Ldap\Adapter\AdapterInterface;
-use Symfony\Component\Ldap\Adapter\ExtLdap\Adapter;
 
 /**
  * This will suppress all the PMD warnings in

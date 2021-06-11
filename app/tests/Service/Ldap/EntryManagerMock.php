@@ -29,8 +29,11 @@ class EntryManagerMock implements EntryManagerInterface
     public function add(Entry $entry)
     {
         // $con = $this->getConnectionResource();
-
+        
         // TODO Define expected responses for tests
+        if (empty($entry->getDn()) || empty($entry->getAttributes())) {
+            throw new LdapException(sprintf('Could not add entry "%s": '));
+        }
         switch ($entry->getDn()) {
             case 'uid=exception':
                 throw new LdapException(sprintf('Could not add entry "%s": ', $entry->getDn()));
@@ -73,6 +76,9 @@ class EntryManagerMock implements EntryManagerInterface
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
             case 'uid=exception':
+                throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()));
+                break;
+            case $entry->getDn() === 'not exist':
                 throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()));
                 break;
 
@@ -183,19 +189,6 @@ class EntryManagerMock implements EntryManagerInterface
                 break;
         }
     }
-
-    // /**
-    //  * Get the connection resource, but first check if the connection is bound.
-    //  */
-    // private function getConnectionResource()
-    // {
-    //     // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
-    //     if (!$this->connection->isBound()) {
-    //         throw new NotBoundException('Query execution is not possible without binding the connection first.');
-    //     }
-
-    //     return $this->connection->getResource();
-    // }
 
     /**
      * @param iterable|UpdateOperation[] $operations An array or iterable of UpdateOperation instances

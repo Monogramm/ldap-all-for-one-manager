@@ -66,10 +66,12 @@ class LdapControllerTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
 
         $client->setServerParameter('HTTP_Authorization', sprintf('Bearer %s', $data['token']));
-        $client->catchExceptions(false);
+        //$client->catchExceptions(false);
         return $client;
     }
-   
+
+    //Get Function test : getLdapEntryByDn
+
     public function testGetLdapEntries()
     {
         $this->client->request('GET', '/api/ldap', ['base'=>$this->fullDn,'query'=>$this->query]);
@@ -81,7 +83,9 @@ class LdapControllerTest extends WebTestCase
         $this->assertNotEmpty($responseEntries['items']);
     }
 
-    public function testCreateLdapEntryByQuery()
+    //Create Function test : createLdapEntry
+
+    public function testCreateLdapEntry()
     {
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -99,17 +103,54 @@ class LdapControllerTest extends WebTestCase
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);
     }
-    
-    public function testEditLdapEntryByQuery()
+
+    public function testCreateLdapEntryWithEmptyContent()
+    {
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+
+        $attr =  $this->serializer->serialize(new Entry('', []), 'json');
+
+        $this->client->request('POST', '/api/admin/ldap', [], [], [], $attr);
+        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testCreateLdapEntryWithoutContent()
+    {
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+
+        $this->client->request('POST', '/api/admin/ldap', [], [], [], null);
+        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testCreateLdapEntryWithoutQueryAndContent()
+    {
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+
+        $this->client->request('POST', '/api/admin/ldap', [], [], [], null);
+
+        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+    }
+
+    //Update Function test : editLdapEntryByQuery
+
+    public function testEditLdapEntry()
     {
         $uri = '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
         $encoders = [new XmlEncoder(), new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $this->serializer = new Serializer($normalizers, $encoders);
         $attr =  $this->serializer->serialize(new Entry(
-            '',
+            'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
             [
-                'description' => ["Decapodian"]
+                'sn' => ['Con'],
+                'objectClass' => ['inetOrgPerson'],
+                'description' => ['Decapodian']
             ]
         ), 'json');
        
@@ -119,12 +160,80 @@ class LdapControllerTest extends WebTestCase
         $this->assertEquals("true", $responseContent);
     }
 
-    public function testDeleteLdapEntryByQuery()
+    public function testEditLdapEntryByQuery()
     {
-        $fullDn = 'cn=Test Test,ou=people,dc=planetexpress,dc=com';
-        $this->client->request('DELETE', "/api/admin/ldap/{$fullDn}");
+        $query = "(description=Human)";
+        $uri = '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+        $attr =  $this->serializer->serialize(new Entry(
+            'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
+            [
+                'sn' => ['Con'],
+                'objectClass' => ['inetOrgPerson'],
+                'description' => ['Decapodian']
+            ]
+        ), 'json');
+       
+        $this->client->request('PUT', $uri, [$query], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);
+    }
+
+    public function testEditLdapEntryWithoutParameters()
+    {
+        $uri = '/api/admin/ldap';
+        $query = "(description=Human)";
+
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+
+        $attr =  $this->serializer->serialize(new Entry(
+            'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
+            [
+                'sn' => ['Con'],
+                'objectClass' => ['inetOrgPerson'],
+                'description' => ['Decapodian']
+            ]
+        ), 'json');
+
+        $this->client->request('PUT', $uri, [$query], [], [], $attr);
+        $this->assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testEditLdapEntryWithoutContent()
+    {
+        $uri = '/api/admin/ldap/cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
+        $encoders = [new XmlEncoder(), new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $this->serializer = new Serializer($normalizers, $encoders);
+
+        $this->client->request('PUT', $uri, [], [], [], null);
+        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+    }
+
+    //Delete Function test : deleteLdapEntry
+
+    public function testDeleteLdapEntry()
+    {
+        $this->client->request('DELETE', "/api/admin/ldap/cn=Test Test,ou=people,dc=planetexpress,dc=com");
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $responseContent = $this->client->getResponse()->getContent();
+        $this->assertEquals("true", $responseContent);
+    }
+
+    public function testDeleteLdapEntryWithoutDn()
+    {
+        $this->client->request('DELETE', "/api/admin/ldap");
+        $this->assertSame(Response::HTTP_METHOD_NOT_ALLOWED, $this->client->getResponse()->getStatusCode());
+    }
+
+    public function testDeleteLdapEntryNotExisting()
+    {
+        $this->client->request('DELETE', "/api/admin/ldap/not exist");
+        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
     }
 }

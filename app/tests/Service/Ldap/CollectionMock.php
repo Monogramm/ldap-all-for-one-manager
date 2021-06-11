@@ -41,27 +41,7 @@ class CollectionMock implements CollectionInterface
      */
     public function count()
     {
-        // $con = $this->connection->getResource();
-        // $searches = $this->search->getResources();
         $count = 1;
-        /*
-        foreach ($searches as $search) {
-            // Count the number of entries
-            //count((array)$search->getAttributes())
-
-            // TODO Define expected responses for tests
-            $t = count($search[0]['attributes']);
-            echo "\n---------------\n";
-            var_dump($t);
-            echo "\n---------------\n";
-            $searchCount = $t;
-
-            if (false === $searchCount) {
-                throw new LdapException('Error while retrieving entry count: ');
-            }
-            $count += $searchCount;
-        }*/
-
         return $count;
     }
 
@@ -70,11 +50,6 @@ class CollectionMock implements CollectionInterface
      */
     public function getIterator()
     {
-        // if (0 === $this->count()) {
-        //     return;
-        // }
-
-        //$con = $this->connection->getResource();
         $searches = $this->search->getResources();
 
         foreach ($searches as $search) {
@@ -146,17 +121,7 @@ class CollectionMock implements CollectionInterface
             default:
                 throw new LdapException('Could not fetch DN: ');
         }
-
-        // if (false === $attributes) {
-        //     throw new LdapException('Could not fetch attributes: ');
-        // }
-
-        //$attributes = $this->cleanupAttributes($attributes);
-
-        // if (false === $dn) {
-        //     throw new LdapException('Could not fetch DN: ');
-        // }
-
+        
         return new Entry($distinguishedNames, $attributes);
     }
 }

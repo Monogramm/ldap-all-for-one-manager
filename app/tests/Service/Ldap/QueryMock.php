@@ -3,7 +3,6 @@
 namespace App\Tests\Service\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AbstractQuery;
-use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Ldap\Exception\NotBoundException;
 

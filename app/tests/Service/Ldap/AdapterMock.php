@@ -5,10 +5,6 @@ namespace App\Tests\Service\Ldap;
 use Symfony\Component\Ldap\Adapter\AdapterInterface;
 use Symfony\Component\Ldap\Adapter\ConnectionInterface;
 use Symfony\Component\Ldap\Adapter\EntryManagerInterface;
-use Symfony\Component\Ldap\Adapter\QueryInterface;
-use Symfony\Component\Ldap\Adapter\ExtLdap\Connection;
-use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
-use Symfony\Component\Ldap\Adapter\ExtLdap\Query;
 use Symfony\Component\Ldap\Exception\LdapException;
 
 /**

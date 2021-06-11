@@ -3,13 +3,7 @@
 namespace App\Tests\Service\Ldap;
 
 use Symfony\Component\Ldap\Adapter\AbstractConnection;
-use Symfony\Component\Ldap\Exception\AlreadyExistsException;
-use Symfony\Component\Ldap\Exception\ConnectionException;
-use Symfony\Component\Ldap\Exception\ConnectionTimeoutException;
-use Symfony\Component\Ldap\Exception\InvalidCredentialsException;
 use Symfony\Component\Ldap\Exception\LdapException;
-use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * This will suppress all the PMD warnings in
