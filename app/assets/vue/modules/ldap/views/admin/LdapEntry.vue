@@ -1,7 +1,6 @@
 <template>
   <app-ldapEntry
     v-if="entry !== null"
-    :id="id"
     :ldap-entry="entry"
     :is-loading="isLoading"
     @submit="onSubmit"
@@ -40,15 +39,14 @@ export default {
       await this.$store
         .dispatch("ldapEntry/get", this.id).then((result: ILdapEntry) => {
           this.entry = result;
+          //TODO Find a better way to implement id
+          this.entry.id = this.id;
         });
     } else {
       this.entry = LdapEntryDefault();
     }
   },
   methods: {
-    onChildPropsChanged(property: string, value: string) {
-      this.entry[property] = value;
-    },
     async editLdapEntry(id: string, ldapEntry: ILdapEntry) {
       await this.$store
         .dispatch("ldapEntry/update", ldapEntry)

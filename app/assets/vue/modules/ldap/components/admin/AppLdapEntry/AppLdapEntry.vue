@@ -61,10 +61,6 @@ export default {
       type: Object,
       default: LdapEntryDefault
     },
-    id: {
-      type: String,
-      default: ''
-    },
     isLoading: {
       type: Boolean,
       default: false
@@ -77,7 +73,7 @@ export default {
   },
   computed: {
     isEdit() {
-      return !!this.id;
+      return !!this.ldapEntry.id;
     }
   },
   methods: {
