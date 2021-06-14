@@ -4,7 +4,6 @@ namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\Serializer;
 
 /**
  * This will suppress all the PMD warnings in
@@ -12,6 +11,9 @@ use Symfony\Component\Serializer\Serializer;
  *
  * @SuppressWarnings(PHPMD)
  */
+
+// @codingStandardsIgnoreFile
+
 class LdapControllerTest extends AuthenticatedWebTestCase
 {
     /**
@@ -32,7 +34,8 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testGetLdapEntries()
     {
-        $this->client->request('GET', '/api/ldap', ['base'=>'uid=john.doe,ou=people,ou=example,ou=com','query'=>$this->query]);
+        $base = 'uid=john.doe,ou=people,ou=example,ou=com';
+        $this->client->request('GET', '/api/ldap', ['base'=>$base,'query'=>$this->query]);
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
@@ -41,7 +44,6 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         $this->assertNotEmpty($responseEntries['items']);
     }
 
-    
     /**
      * Function test getLdapEntryByDn normal use
      */
@@ -64,7 +66,10 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     {
         $param = 'not-exist';
         $this->client->request('GET', "/api/ldap/$param");
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
     }
 
     /**
@@ -97,7 +102,10 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         }';
 
         $this->client->request('POST', '/api/admin/ldap', [], [], [], $attr);
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
     }
 
     /**
@@ -163,7 +171,10 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         }';
 
         $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=>$query], [], [], $attr);
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
     }
 
     /**
@@ -184,6 +195,9 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     public function testDeleteLdapEntryNotExisting()
     {
         $this->client->request('DELETE', '/api/admin/ldap/not-exist');
-        $this->assertSame(Response::HTTP_INTERNAL_SERVER_ERROR, $this->client->getResponse()->getStatusCode());
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
     }
 }
