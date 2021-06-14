@@ -25,11 +25,11 @@ class QueryMock extends AbstractQuery
 
     public function __construct(
         ConnectionMock $connection,
-        string $distinguishedNames,
+        string $dn,
         string $query,
         array $options = []
     ) {
-        parent::__construct($connection, $distinguishedNames, $query, $options);
+        parent::__construct($connection, $dn, $query, $options);
     }
 
     public function __sleep()
@@ -60,6 +60,7 @@ class QueryMock extends AbstractQuery
      */
     public function execute()
     {
+        $this->dn;
         if (null === $this->results) {
             // If the connection is not bound, throw an exception. Users should use an explicit bind call first.
             if (!$this->connection->isBound()) {
@@ -103,7 +104,7 @@ class QueryMock extends AbstractQuery
                 // TODO Define expected responses for tests
                 // TODO verify if $con and $sizeLimit is useful fot the test
                 // $search = $this->callSearchFunction($con, $func, $sizeLimit);
-                $search = $this->callSearchFunction($func);
+                $search = $this->callSearchFunction($func, $this->dn);
 
                 if (false === $search) {
                     $ldapError = 'LDAP error';
@@ -167,17 +168,27 @@ class QueryMock extends AbstractQuery
      *
      * @return array
      */
-    private function callSearchFunction(string $func)
+    private function callSearchFunction(string $func, string $fullDn)
     {
+        switch ($fullDn) {
+            case $fullDn === 'not-exist':
+                throw new LdapException('Could not complete search No such object');
+            case $fullDn === 'empty':
+                return null;
+        }
+
         // TODO Define expected responses for tests
         switch ($func) {
             case 'ldap_read':
                 # code...
-                //$ret = new Entry('uid=john.doe,ou=people,ou=example,ou=com');
                 $ret = array(
-                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                        'dn'=>'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
                         'attributes'=> array(
-                            'uid'=>['john.doe']
+                            'objectClass'=>['inetOrgPerson'],
+                            'sn'=>['Conrad'],
+                            'mail'=> ['hermes@planetexpress.com'],
+                            'uid'=>['hermes'],
+                            'method'=>['ldap_read']
                         )
                     );
                 break;
@@ -188,7 +199,7 @@ class QueryMock extends AbstractQuery
                         array(
                             'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
                             'attributes'=> array(
-                                'uid'=>['john.doe']
+                                'method'=>['ldap_list']
                             )
                         )
                     );
@@ -198,9 +209,9 @@ class QueryMock extends AbstractQuery
                 # code...
                 $ret = array(
                     array(
-                        'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
+                        'dn'=>'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
                         'attributes'=> array(
-                            'uid'=>['john.doe']
+                            'method'=>['ldap_search']
                         )
                     )
                 );

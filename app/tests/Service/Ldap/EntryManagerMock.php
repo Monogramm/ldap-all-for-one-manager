@@ -52,8 +52,13 @@ class EntryManagerMock implements EntryManagerInterface
      */
     public function update(Entry $entry)
     {
+        if ($entry->getDn()==='not-exist') {
+            throw new LdapException(sprintf('Entry do not exist'));
+        }
         // $con = $this->getConnectionResource();
-
+        if (empty($entry->getDn()) || empty($entry->getAttributes())) {
+            throw new LdapException(sprintf('Could not add entry "%s": '));
+        }
         // TODO Define expected responses for tests
         switch ($entry->getDn()) {
             case 'uid=exception':
@@ -78,7 +83,7 @@ class EntryManagerMock implements EntryManagerInterface
             case 'uid=exception':
                 throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()));
                 break;
-            case $entry->getDn() === 'not exist':
+            case $entry->getDn() === 'not-exist':
                 throw new LdapException(sprintf('Could not remove entry "%s": ', $entry->getDn()));
                 break;
 

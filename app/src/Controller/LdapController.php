@@ -11,6 +11,9 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\DTO\LdapEntryDTO;
+use PayPalHttp\Serializer;
+use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
+use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
 class LdapController extends AbstractController
 {
@@ -103,11 +106,16 @@ class LdapController extends AbstractController
         // TODO Add attributes option.
         $options = $request->get('options', []);
 
+        if (empty($entry)) {
+            // TODO Return translated error message.
+            return $jsonResponse->create(null, 400);
+        }
+
         $ldap->bind();
         $ldapEntry = $ldap->get($query, $entry, $options);
         if (empty($ldapEntry)) {
             // TODO Return translated error message.
-            return $jsonResponse->create(null, 404);
+            return $jsonResponse->create(null, 400);
         }
 
         // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
@@ -129,12 +137,17 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
-        $dto = $serializer->deserialize(
-            $request->getContent(),
-            Entry::class,
-            'json'
-        );
         $jsonResponse = new JsonResponse();
+
+        try {
+            $dto = $serializer->deserialize(
+                $request->getContent(),
+                Entry::class,
+                'json'
+            );
+        } catch (NotEncodableValueException $exception) {
+            return $jsonResponse->create(null, 400);
+        }
 
         // TODO Deserialize from base64 jpegPhoto.
         try {
@@ -156,7 +169,7 @@ class LdapController extends AbstractController
      *
      * @return JsonResponse
      */
-    public function editLdapEntryByQuery(
+    public function editLdapEntry(
         string $fullDN,
         Client $ldap,
         Request $request,
@@ -166,13 +179,21 @@ class LdapController extends AbstractController
         /**
          * @var Entry $dto
          */
-        $dto = $serializer->deserialize(
-            $request->getContent(),
-            Entry::class,
-            'json'
-        );
-        // TODO Deserialize from base64 jpegPhoto.
+
         $jsonResponse = new JsonResponse();
+
+        try {
+            $dto = $serializer->deserialize(
+                $request->getContent(),
+                Entry::class,
+                'json'
+            );
+        } catch (NotEncodableValueException $exception) {
+            return $jsonResponse->create(null, 400);
+        }
+
+        // TODO Deserialize from base64 jpegPhoto.
+
         try {
             $ldap->bind();
 
@@ -203,6 +224,12 @@ class LdapController extends AbstractController
         $result = false;
         $status = 400;
         $jsonResponse = new JsonResponse();
+
+        if (empty($fullDn)) {
+            // TODO Return translated error message.
+            return $jsonResponse->create(null, 400);
+        }
+
         try {
             $ldap->bind();
             $result = $ldap->delete($fullDn);
