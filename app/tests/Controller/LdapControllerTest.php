@@ -7,10 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * This will suppress all the PMD TooManyPublicMethods
- * warnings in this class.
+ * This will suppress all the PMD warnings in
+ * this class.
  *
- * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD)
  */
 class LdapControllerTest extends AuthenticatedWebTestCase
 {
