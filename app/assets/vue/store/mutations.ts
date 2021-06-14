@@ -151,7 +151,7 @@ export const ReadWriteMutations: IReadWriteMutations<IEntity, IEntityState<IEnti
     state.error.status = null;
     state.error.message = null;
     state.items.splice(
-      state.items.findIndex((i: any) => {
+      state.items.findIndex((i: IEntity) => {
         return i.id === entityId;
       }),
       1

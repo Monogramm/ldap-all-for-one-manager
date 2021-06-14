@@ -1,5 +1,3 @@
-import { IEntity, Entity } from "../../../interfaces/entity";
-
 /**
  * LDAP Entry attributes interface.
  */
@@ -10,7 +8,7 @@ export interface ILdapAttributes {
 /**
  * LDAP Entry interface.
  */
-export interface ILdapEntry extends IEntity {
+export interface ILdapEntry {
   dn: string;
   attributes: ILdapAttributes;
 
@@ -44,16 +42,11 @@ export interface ILdapEntry extends IEntity {
 /**
  * LDAP Entry class.
  */
-export class LdapEntry extends Entity implements ILdapEntry {
+export class LdapEntry implements ILdapEntry {
   constructor(
     public dn : string,
-    id : string,
-    createdAt: Date = new Date(),
-    updatedAt: Date = new Date(),
     public attributes: ILdapAttributes = {},
-  ) {
-    super(id, createdAt, updatedAt);
-  }
+  ) { }
 
   getAttribute(name: string): Array<any> {
     return this.attributes[name] ?? null;
@@ -72,5 +65,5 @@ export class LdapEntry extends Entity implements ILdapEntry {
  * Factory to generate new default LdapEntry class.
  */
 export const LdapEntryDefault = (): LdapEntry => {
-  return new LdapEntry(null,null);
+  return new LdapEntry(null);
 };
