@@ -12,7 +12,7 @@
         <div class="columns mt-2 is-mobile">
           <!-- Name of the table-->
           <div class="ml-4 is-align-items-center is-flex">
-            <h1 class="title has-text-centered is-size-4-mobile">
+            <h1 class="title is-4 has-text-centered is-size-4-mobile">
               {{ index }}
             </h1>
           </div>
@@ -39,7 +39,6 @@
         >
           <b-input
             v-model="newAttributeKey"
-            required
             :placeholder="$t('ldap.entries.example-input')"
             type="text"
           />
@@ -58,7 +57,7 @@
 <script lang="ts">
 import { PropType } from 'vue';
 
-import { ILdapAttributes, ILdapEntry, LdapEntry } from "../../../interfaces/entry";
+import { ILdapAttributes } from "../../../interfaces/entry";
 
 import AppLdapAttribute from "../../admin/AppLdapAttribute/AppLdapAttribute.vue";
 

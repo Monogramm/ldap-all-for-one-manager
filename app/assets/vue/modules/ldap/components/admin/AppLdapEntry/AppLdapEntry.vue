@@ -39,6 +39,7 @@
         <b-button
           type="is-primary"
           native-type="submit"
+          :disabled="ldapEntry.dn == '' || ldapEntry.dn == null "
           :loading="isLoading"
           @click="submit"
         >
@@ -50,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { ILdapEntry, LdapEntry, LdapEntryDefault } from "../../../interfaces/entry";
+import { LdapEntryDefault } from "../../../interfaces/entry";
 import AppLdapAttributes from "../../admin/AppLdapAttributes/AppLdapAttributes.vue";
 
 export default {
