@@ -9,11 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
  * This will suppress all the PMD warnings in
  * this class.
  *
- * @SuppressWarnings(PHPMD)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-
-// @codingStandardsIgnoreFile
-
 class LdapControllerTest extends AuthenticatedWebTestCase
 {
     /**
@@ -22,7 +19,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     private $client = null;
 
     public $fullDn = 'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
-    public $query = '(cn=Hermes Conrad)';
+    public $query = '(description=Human)';
 
     public function setUp(): void
     {
@@ -34,23 +31,81 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testGetLdapEntries()
     {
-        $base = 'uid=john.doe,ou=people,ou=example,ou=com';
-        $this->client->request('GET', '/api/ldap', ['base'=>$base,'query'=>$this->query]);
+        $this->client->request(
+            'GET',
+            '/api/ldap',
+            [
+                'base'=>$this->fullDn,
+                'query'=>$this->query,
+                'filters'=>'[]',
+                'attributes'=>['dn'],
+                'size'=>0,
+                'max'=>0
+            ]
+        );
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $responseEntries = json_decode($responseContent, true);
-        $this->assertCount(2, $responseEntries);
         $this->assertNotEmpty($responseEntries['items']);
+    }
+
+    /**
+     * Function test getLdapEntries without parameter
+     */
+    public function testGetLdapEntriesWithoutParameters()
+    {
+        $this->client->request('GET', '/api/ldap', []);
+
+        $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        $responseContent = $this->client->getResponse()->getContent();
+        $responseEntries = json_decode($responseContent, true);
+        $this->assertNotEmpty($responseEntries['items']);
+    }
+
+    /**
+     * Function test getLdapEntries Entry doesn't exist
+     */
+    public function testGetLdapEntriesNoEntry()
+    {
+        $this->client->request(
+            'GET',
+            '/api/ldap',
+            [
+                'base'=>'not-exist',
+                'query'=>'',
+                'filters'=>'[]',
+                'attributes'=>['dn'],
+                'size'=>0,
+                'max'=>0
+            ]
+        );
+
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
+    }
+
+    /**
+     * Function test getLdapEntries Error
+     */
+    public function testGetLdapEntriesWError()
+    {
+        $this->client->request('GET', '/api/ldap', ['base'=>'empty',]);
+
+        $this->assertSame(
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+            $this->client->getResponse()->getStatusCode()
+        );
     }
 
     /**
      * Function test getLdapEntryByDn normal use
      */
-    public function testgetLdapEntryByDn()
+    public function testGetLdapEntryByDn()
     {
-        $param = urlencode($this->fullDn);
-        $this->client->request('GET', "/api/ldap/$param");
+        $this->client->request('GET', "/api/ldap/$this->fullDn");
 
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
@@ -62,7 +117,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     /**
      * Function test getLdapEntryByDn Entry doesn't exist
      */
-    public function testgetLdapEntryByDnNoEntry()
+    public function testGetLdapEntryByDnNoEntry()
     {
         $param = 'not-exist';
         $this->client->request('GET', "/api/ldap/$param");
@@ -113,7 +168,6 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testEditLdapEntry()
     {
-        $param = urlencode($this->fullDn);
 
         $attr = '{
             "dn":"cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com",
@@ -124,7 +178,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
             }
         }';
 
-        $this->client->request('PUT', "/api/admin/ldap/$param", [], [], [], $attr);
+        $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);
@@ -135,9 +189,6 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testEditLdapEntryByQuery()
     {
-        $query = '(description=Human)';
-        $param = urlencode($this->fullDn);
-
         $attr = '{
             "dn":"cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com",
             "attributes":{
@@ -147,7 +198,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
             }
         }';
 
-        $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=>$query], [], [], $attr);
+        $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", ['query'=>$this->query], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);
@@ -158,9 +209,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testEditLdapEntryNoEntry()
     {
-        $query = '(description=Human)';
         $param = 'not-exist';
-
         $attr = '{
             "dn":"not-exist",
             "attributes":{
@@ -170,7 +219,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
             }
         }';
 
-        $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=>$query], [], [], $attr);
+        $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=> $this->query], [], [], $attr);
         $this->assertSame(
             Response::HTTP_INTERNAL_SERVER_ERROR,
             $this->client->getResponse()->getStatusCode()
@@ -182,8 +231,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
      */
     public function testDeleteLdapEntry()
     {
-        $param = urlencode($this->fullDn);
-        $this->client->request('DELETE', "/api/admin/ldap/$param");
+        $this->client->request('DELETE', "/api/admin/ldap/$this->fullDn");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
         $this->assertEquals("true", $responseContent);

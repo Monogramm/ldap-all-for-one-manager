@@ -11,7 +11,6 @@ use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\DTO\LdapEntryDTO;
-use PayPalHttp\Serializer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
@@ -27,6 +26,8 @@ class LdapController extends AbstractController
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
+
+        $jsonResponse = new JsonResponse();
         $query = $request->get('query', '(objectClass=*)');
         $baseDn = $request->get('base', null);
 
@@ -63,15 +64,17 @@ class LdapController extends AbstractController
         $options['maxItems'] = $max;
 
         $ldap->bind();
+
+        //XXX Verify If there is a need to throw a special error by try catch
         $ldapEntries = $ldap->search($query, $baseDn, $options);
-
         $total = count($ldapEntries);
-
         $entries = array();
+
         foreach ($ldapEntries as $key => $ldapEntry) {
             $entries[$key]['dn'] = $ldapEntry->getDn();
-            // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
+
             $ldapDto = new LdapEntryDTO();
+            //XXX Verify if there is a need to throw a special error by try catch
             $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
 
             // Rely on filter option to filter attributes
@@ -118,8 +121,8 @@ class LdapController extends AbstractController
             return $jsonResponse->create(null, 400);
         }
 
-        // TODO Create a LdapEntry DTO for serialization from/to Entry (in particular jpegPhoto)
         $ldapDto = new LdapEntryDTO();
+        //XXX Verify if there is a need to throw a special error by try catch
         $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
 
         $dto = $serializer->serialize($ldapEntry, 'json');

@@ -174,7 +174,7 @@ class QueryMock extends AbstractQuery
             case $fullDn === 'not-exist':
                 throw new LdapException('Could not complete search No such object');
             case $fullDn === 'empty':
-                return null;
+                return [];
         }
 
         // TODO Define expected responses for tests
