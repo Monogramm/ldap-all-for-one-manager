@@ -1,6 +1,6 @@
 <!-- Component responsible for the creation of inputs-->
 <template>
-  <div class="mb-2">
+  <div class="">
     <template
       v-for="(row, index) in attributes"
     >
@@ -36,7 +36,7 @@
       </div>
     </template>
     <div
-      class="columns is-mobile"
+      class="columns mb-0 is-mobile"
     >
       <div class="column is-three-fifths is-offset-one-fifth" />
       <div class="column is-2 pl-0">

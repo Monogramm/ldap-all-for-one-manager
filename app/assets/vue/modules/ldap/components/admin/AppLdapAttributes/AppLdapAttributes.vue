@@ -6,12 +6,12 @@
     >
       <div
         :key="`divBoucleAttributes:${index}`"
-        class="box"
+        class="box m-1 p-1"
       >
         <!-- Button for retrieving input-->
-        <div class="columns mt-2 is-mobile">
+        <div class="columns mb-1 mt-1 is-mobile">
           <!-- Name of the table-->
-          <div class="ml-4 is-align-items-center is-flex">
+          <div class="ml-5 is-align-items-center is-flex">
             <h1 class="title is-4 has-text-centered is-size-4-mobile">
               {{ index }}
             </h1>
@@ -32,7 +32,7 @@
       </div>
     </template>
 
-    <div class="columns is mobile">
+    <div class="columns mx-4 mt-4 is mobile">
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
         <b-field
           :label="$t('ldap.entries.label-key')" 
