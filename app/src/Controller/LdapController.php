@@ -27,7 +27,6 @@ class LdapController extends AbstractController
         SerializerInterface $serializer
     ): JsonResponse {
 
-        $jsonResponse = new JsonResponse();
         $query = $request->get('query', '(objectClass=*)');
         $baseDn = $request->get('base', null);
 
