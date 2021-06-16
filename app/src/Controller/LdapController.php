@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\LdapEntryDTO;
 use App\Service\Ldap\Client;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,7 +11,6 @@ use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
-use App\DTO\LdapEntryDTO;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 
