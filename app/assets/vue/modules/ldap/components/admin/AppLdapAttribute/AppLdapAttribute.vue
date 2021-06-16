@@ -14,7 +14,7 @@
         >
           <!-- Input value attribute-->
           <b-input
-            :key="`valueInput:${index}`"
+            :key="`inputValue:${index}`"
             v-model="attributes[index]"
             :value="row"
             type="text"
@@ -27,7 +27,7 @@
         >
           <!-- Section for the input create/delete-->
           <b-button
-            :key="`valueremoveValue:${index}`"
+            :key="`buttonRemoveValue:${index}`"
             type="is-danger"
             icon-right="trash"
             @click="removeValue(index)"

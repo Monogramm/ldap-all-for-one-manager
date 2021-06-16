@@ -65,7 +65,7 @@ export default {
     isLoading: {
       type: Boolean,
       default: false
-    }
+    },
     isEdit: {
       type: Boolean,
       default: false
