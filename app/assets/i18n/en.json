@@ -252,11 +252,16 @@
       "edit": "Edit LDAP Entry",
       "create": "Create LDAP Entry",
       "dn": "Distinguished Name",
-      "label-key":"New attribute name",
-      "example-input": "Example : sn",
-      "description": "Description",
-      "button-add-a-attribute": "Add an attribute",
-      "ldap-placeholder": "ldap attribute"
+      "new": {
+        "attribute": {
+            "key-label": "New attribute name",
+            "key-placeholder": "Example: sn",
+            "add": "Add an attribute"
+        },
+        "value": {
+            "value-placeholder": "LDAP attribute value"
+        }
+      }
     }
   },
   "background-jobs": {

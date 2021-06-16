@@ -18,7 +18,7 @@
             v-model="attributes[index]"
             :value="row"
             type="text"
-            :placeholder="$t('ldap.entries.ldap-placeholder')"
+            :placeholder="$t('ldap.entries.new.value.value-placeholder')"
           />
         </div>
         <div

@@ -35,11 +35,11 @@
     <div class="columns mx-4 mt-4 is mobile">
       <div class="column is-one-third is-two-fifths is-offset-one-quarter">
         <b-field
-          :label="$t('ldap.entries.label-key')" 
+          :label="$t('ldap.entries.new.attribute.key-label')" 
         >
           <b-input
             v-model="newAttributeKey"
-            :placeholder="$t('ldap.entries.example-input')"
+            :placeholder="$t('ldap.entries.new.attribute.key-placeholder')"
             type="text"
           />
         </b-field>
@@ -47,7 +47,7 @@
         <b-button
           @click="addAttribute()"
         >
-          {{ $t('ldap.entries.button-add-a-attribute') }}
+          {{ $t('ldap.entries.new.attribute.add') }}
         </b-button>
       </div>
     </div>
