@@ -12,7 +12,7 @@ export interface IEntity {
  */
 export abstract class Entity implements IEntity {
   constructor(
-      public id: string = '',
+      public id: string = null,
       public createdAt: Date = new Date(),
       public updatedAt: Date = new Date(),
   ) {}
