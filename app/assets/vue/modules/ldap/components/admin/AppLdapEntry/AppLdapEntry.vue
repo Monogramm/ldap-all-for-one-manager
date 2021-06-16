@@ -66,16 +66,15 @@ export default {
       type: Boolean,
       default: false
     }
+    isEdit: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
       newEntry: this.ldapEntry,
     };
-  },
-  computed: {
-    isEdit() {
-      return !!this.ldapEntry.id;
-    }
   },
   methods: {
     submit() {

@@ -1,8 +1,9 @@
 <template>
-  <app-ldapEntry
+  <app-ldap-entry
     v-if="entry !== null"
     :ldap-entry="entry"
     :is-loading="isLoading"
+    :is-edit="isEdit"
     @submit="onSubmit"
   />
 </template>
@@ -17,7 +18,7 @@ export default {
   name: "LdapEntry",
   components: { AppLdapEntry },
   props: {
-    id: {
+    dn: {
       type: String,
       default: ""
     }
@@ -31,23 +32,22 @@ export default {
     // TODO Add types to ldapEntry getters
     ...mapGetters("ldapEntry", ["isLoading", "item", "hasError", "error"]),
     isEdit() {
-      return !!this.id;
+      return !!this.dn;
     }
   },
   async created() {
-    if (this.id) {
+    if (this.dn) {
       await this.$store
-        .dispatch("ldapEntry/get", this.id).then((result: ILdapEntry) => {
+        .dispatch("ldapEntry/get", this.dn).then((result: ILdapEntry) => {
           this.entry = result;
-          //TODO Find a better way to implement id
-          this.entry.id = this.id;
         });
     } else {
       this.entry = LdapEntryDefault();
     }
   },
   methods: {
-    async editLdapEntry(id: string, ldapEntry: ILdapEntry) {
+    async editLdapEntry(dn: string, ldapEntry: ILdapEntry) {
+      // TODO Call a rename if dn different from ldapEntry.dn
       await this.$store
         .dispatch("ldapEntry/update", ldapEntry)
         .then(() => {
@@ -67,7 +67,7 @@ export default {
     },
     onSubmit() {
       if (this.isEdit) {
-        return this.editLdapEntry(this.id, this.entry);
+        return this.editLdapEntry(this.dn, this.entry);
       }
 
       return this.createLdapEntry(this.entry);

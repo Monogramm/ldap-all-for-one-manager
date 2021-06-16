@@ -21,13 +21,13 @@ export const LdapEntryRoutes: RouteConfig[] = [
   },
   {
     name: "LdapEntryEdit",
-    path: "/admin/ldap-entry/:id",
+    path: "/admin/ldap-entry/:dn",
     component: AdminLdapEntry,
     meta: {
       requiresAuth: true,
       requiresAdmin: true,
     },
-    props: (route) => ({ id: route.params.id }),
+    props: (route) => ({ dn: route.params.dn }),
   },
   {
     name: "LdapEntryCreate",
