@@ -1,5 +1,5 @@
 <template>
-  <app-ldapEntries
+  <app-ldap-entries
     :is-loading="isLoading"
     :ldap-entries="items"
     :per-page="pagination.size"

@@ -27,10 +27,10 @@
         >
           <!-- Section for the input create/delete-->
           <b-button
-            :key="`valueRemoveInput:${index}`"
+            :key="`valueremoveValue:${index}`"
             type="is-danger"
             icon-right="trash"
-            @click="removeInput(index)"
+            @click="removeValue(index)"
           />
         </div>
       </div>
@@ -42,7 +42,7 @@
       <div class="column is-2 pl-0">
         <b-button
           icon-right="plus"
-          @click="addInput()"
+          @click="addValue()"
         />
       </div>
     </div>
@@ -65,10 +65,10 @@ export default {
     };
   },
   methods: {
-    addInput() {
+    addValue() {
       this.attributes.push('');
     },
-    removeInput(index: number) {
+    removeValue(index: number) {
       this.attributes.splice(index, 1);
     },
     getLastItem() {

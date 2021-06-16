@@ -5,7 +5,7 @@
       class="container"
     >
       <div
-        :key="`divBoucleAttributes:${index}`"
+        :key="`divAttributesLoop:${index}`"
         class="box m-1 p-1"
       >
         <!-- Button for retrieving input-->
