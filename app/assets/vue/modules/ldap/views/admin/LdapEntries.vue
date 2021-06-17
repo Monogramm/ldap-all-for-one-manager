@@ -59,7 +59,7 @@ export default {
       }
     },
     onEdit(paramId: string) {
-      this.$router.push({ name: "LdapEntryEdit", params: { id: paramId } });
+      this.$router.push({ name: "LdapEntryEdit", params: { dn: paramId } });
     },
     onCreate() {
       this.$router.push({ name: "LdapEntryCreate" });
