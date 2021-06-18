@@ -13,6 +13,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LdapController extends AbstractController
 {
@@ -72,9 +73,8 @@ class LdapController extends AbstractController
         foreach ($ldapEntries as $key => $ldapEntry) {
             $entries[$key]['dn'] = $ldapEntry->getDn();
 
-            $ldapDto = new LdapEntryDTO();
             //XXX Verify if there is a need to throw a special error by try catch
-            $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
+            LdapEntryDTO::serializeJpegPhoto($ldapEntry);
 
             // Rely on filter option to filter attributes
             $entries[$key]['attributes'] = $ldapEntry->getAttributes();
@@ -92,41 +92,34 @@ class LdapController extends AbstractController
     }
 
     /**
-     * @Route("/api/ldap/{entry}", name="get_ldap_entry", methods={"GET"})
-     *
-     * @return JsonResponse
+     * @Route("/api/ldap/{fullDN}", name="get_ldap_entry", methods={"GET"})
+     * 
+     * @return JsonResponse Entry | LdapException
      */
     public function getLdapEntryByDn(
-        string $entry,
+        string $fullDN,
         Client $ldap,
         Request $request,
         SerializerInterface $serializer
     ): JsonResponse {
-        $jsonResponse = new JsonResponse();
 
         $query = $request->get('query', '(objectClass=*)');
         // TODO Add attributes option.
         $options = $request->get('options', []);
 
-        if (empty($entry)) {
-            // TODO Return translated error message.
-            return $jsonResponse->create(null, 400);
-        }
-
         $ldap->bind();
-        $ldapEntry = $ldap->get($query, $entry, $options);
-        if (empty($ldapEntry)) {
-            // TODO Return translated error message.
-            return $jsonResponse->create(null, 400);
+        try {
+            $ldapEntry = $ldap->get($query, $fullDN, $options);
+        } catch (LdapException $exception) {
+            return new JsonResponse($exception->getMessage(), 400);
         }
 
-        $ldapDto = new LdapEntryDTO();
         //XXX Verify if there is a need to throw a special error by try catch
-        $ldapEntry =  $ldapDto->serializeJpegPhoto($ldapEntry);
+        LdapEntryDTO::serializeJpegPhoto($ldapEntry);
 
         $dto = $serializer->serialize($ldapEntry, 'json');
 
-        return $jsonResponse->fromJsonString($dto);
+        return JsonResponse::fromJsonString($dto);
     }
 
     /**
@@ -137,9 +130,9 @@ class LdapController extends AbstractController
     public function createLdapEntry(
         Client $ldap,
         Request $request,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TranslatorInterface $translator
     ): JsonResponse {
-        $jsonResponse = new JsonResponse();
 
         try {
             $dto = $serializer->deserialize(
@@ -148,21 +141,19 @@ class LdapController extends AbstractController
                 'json'
             );
         } catch (NotEncodableValueException $exception) {
-            return $jsonResponse->create(null, 400);
+            return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
         // TODO Deserialize from base64 jpegPhoto.
         try {
-            // TODO Check result.
             $ldap->bind();
-            $result = $ldap->create($dto->getDn(), $dto->getAttributes());
-            
-            return $jsonResponse->fromJsonString(
-                $serializer->serialize($result, 'json')
+            $ldap->create($dto->getDn(), $dto->getAttributes());
+
+            return JsonResponse::fromJsonString(
+                $serializer->serialize($translator->trans('sucess.ldap'), 'json')
             );
         } catch (LdapException $exception) {
-            // TODO Log the exception.
-            return $jsonResponse->create($exception->getMessage(), 500);
+            return new JsonResponse($exception->getMessage(), 500);
         }
     }
 
@@ -175,14 +166,10 @@ class LdapController extends AbstractController
         string $fullDN,
         Client $ldap,
         Request $request,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TranslatorInterface $translator
     ): JsonResponse {
         $query = $request->get('query', '(objectClass=*)');
-        /**
-         * @var Entry $dto
-         */
-
-        $jsonResponse = new JsonResponse();
 
         try {
             $dto = $serializer->deserialize(
@@ -191,26 +178,21 @@ class LdapController extends AbstractController
                 'json'
             );
         } catch (NotEncodableValueException $exception) {
-            return $jsonResponse->create(null, 400);
+            return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
         // TODO Deserialize from base64 jpegPhoto.
 
         try {
             $ldap->bind();
+            $ldap->update($fullDN, $query, $dto->getAttributes());
 
-            // TODO Check result.
-            if ($result = $ldap->update($fullDN, $query, $dto->getAttributes()) === true) {
-                return $jsonResponse->fromJsonString(
-                    $serializer->serialize($result, 'json')
-                );
-            };
-
-            //TODO MODIFY DEFAULT RETURN
-            return $jsonResponse->create($result, 500);
+            return JsonResponse::fromJsonString(
+                $serializer->serialize($translator->trans('sucess.ldap'), 'json')
+            );
         } catch (LdapException $exception) {
             // TODO Log the exception.
-            return $jsonResponse->create($exception->getMessage(), 500);
+            return new JsonResponse($exception->getMessage(), 500);
         }
     }
 
@@ -221,27 +203,23 @@ class LdapController extends AbstractController
      */
     public function deleteLdapEntry(
         string $fullDn,
-        Client $ldap
+        Client $ldap,
+        TranslatorInterface $translator
     ): JsonResponse {
         $result = false;
         $status = 400;
-        $jsonResponse = new JsonResponse();
-
-        if (empty($fullDn)) {
-            // TODO Return translated error message.
-            return $jsonResponse->create(null, 400);
-        }
 
         try {
             $ldap->bind();
-            $result = $ldap->delete($fullDn);
+            $ldap->delete($fullDn);
+            
+            $result = $translator->trans('sucess.ldap');
             $status = 200;
         } catch (LdapException $exception) {
-            // TODO Log the exception.
             $result = $exception->getMessage();
             $status = 500;
         }
 
-        return $jsonResponse->create($result, $status);
+        return new JsonResponse($result, $status);
     }
 }

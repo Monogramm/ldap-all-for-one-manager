@@ -3,47 +3,96 @@
 namespace App\DTO;
 
 use RuntimeException;
-use Symfony\Component\Ldap\Entry;
 
 class LdapEntryDTO
 {
-    //TODO Create attrribute associate with LdapEntry
-    //TODO Create getter and setter
+    private $dn;
+    private $attributes;
 
     /**
-     * @var string
+     * Returns the entry's DN.
+     *
+     * @return string
      */
-    public $distinguishedNames;
+    public function getDn()
+    {
+        return $this->dn;
+    }
 
     /**
-     * @var array
+     * Returns whether an attribute exists.
+     *
+     * @param string $name The name of the attribute
+     *
+     * @return bool
      */
-    public $attributes;
-
-    public function setdn($distinguishedNames): void
+    public function hasAttribute($name)
     {
-        $this->dn = $distinguishedNames;
+        return isset($this->attributes[$name]);
     }
 
-    public function getName(): string
+    /**
+     * Returns a specific attribute's value.
+     *
+     * As LDAP can return multiple values for a single attribute,
+     * this value is returned as an array.
+     *
+     * @param string $name The name of the attribute
+     *
+     * @return array|null
+     */
+    public function getAttribute($name)
     {
-        return $this->name;
+        return $this->attributes[$name] ?? null;
     }
 
-    public function setAttributes($attributes): void
-    {
-        $this->attributes = $attributes;
-    }
-
-    public function getAttributes(): array
+    /**
+     * Returns the complete list of attributes.
+     *
+     * @return array
+     */
+    public function getAttributes()
     {
         return $this->attributes;
     }
 
     /**
-     * @return false|string
+     * Sets a value for the given attribute.
+     *
+     * @param string $name
      */
-    public static function serializeEntry(Entry $ldapEntry, string $format)
+    public function setAttribute($name, array $value)
+    {
+        $this->attributes[$name] = $value;
+    }
+
+    /**
+     * Removes a given attribute.
+     *
+     * @param string $name
+     */
+    public function removeAttribute($name)
+    {
+        unset($this->attributes[$name]);
+    }
+
+    /**
+     * @param string $format
+     * 
+     * @return string
+     */
+    public function serialize(string $format)
+    {
+        return self::serializeEntry($this, $format);
+    }
+
+    /**
+     * @param Entry|LdapEntryDTO $ldapEntry 
+     * @param string $format
+     * 
+     * @return string
+     */
+    public static function serializeEntry($ldapEntry, string $format = 'json')
     {
         $outputEntry = '';
 
@@ -73,7 +122,13 @@ class LdapEntryDTO
         return $outputEntry;
     }
 
-    public static function serializeJpegPhoto(Entry $ldapEntry): Entry
+    /**     
+     * @param Entry|LdapEntryDTO $ldapEntry
+     * @param string $format
+     * 
+     * @return string
+     */
+    public static function serializeJpegPhoto($ldapEntry)
     {
         // Serialize in base64 jpegPhoto.
         if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {

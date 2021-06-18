@@ -122,7 +122,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         $param = 'not-exist';
         $this->client->request('GET', "/api/ldap/$param");
         $this->assertSame(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_BAD_REQUEST,
             $this->client->getResponse()->getStatusCode()
         );
     }
@@ -181,7 +181,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals("true", $responseContent);
+        $this->assertEquals('"The op\u00e9ration is successful"', $responseContent);
     }
 
     /**
@@ -201,7 +201,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
         $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", ['query'=>$this->query], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
         $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals("true", $responseContent);
+        $this->assertEquals('"The op\u00e9ration is successful"', $responseContent);
     }
 
         /**
@@ -221,7 +221,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
 
         $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=> $this->query], [], [], $attr);
         $this->assertSame(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_BAD_REQUEST,
             $this->client->getResponse()->getStatusCode()
         );
     }
@@ -244,7 +244,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     {
         $this->client->request('DELETE', '/api/admin/ldap/not-exist');
         $this->assertSame(
-            Response::HTTP_INTERNAL_SERVER_ERROR,
+            Response::HTTP_BAD_REQUEST,
             $this->client->getResponse()->getStatusCode()
         );
     }
