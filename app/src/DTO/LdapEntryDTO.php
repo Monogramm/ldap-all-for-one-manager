@@ -3,6 +3,7 @@
 namespace App\DTO;
 
 use RuntimeException;
+use Symfony\Component\Ldap\Entry;
 
 class LdapEntryDTO
 {
@@ -78,7 +79,7 @@ class LdapEntryDTO
 
     /**
      * @param string $format
-     * 
+     *
      * @return string
      */
     public function serialize(string $format)
@@ -87,9 +88,9 @@ class LdapEntryDTO
     }
 
     /**
-     * @param Entry|LdapEntryDTO $ldapEntry 
+     * @param Entry|self $ldapEntry
      * @param string $format
-     * 
+     *
      * @return string
      */
     public static function serializeEntry($ldapEntry, string $format = 'json')
@@ -122,11 +123,11 @@ class LdapEntryDTO
         return $outputEntry;
     }
 
-    /**     
-     * @param Entry|LdapEntryDTO $ldapEntry
+    /**
+     * @param Entry|self $ldapEntry
      * @param string $format
-     * 
-     * @return string
+     *
+     * @return Entry
      */
     public static function serializeJpegPhoto($ldapEntry)
     {

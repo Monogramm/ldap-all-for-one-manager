@@ -93,7 +93,7 @@ class LdapController extends AbstractController
 
     /**
      * @Route("/api/ldap/{fullDN}", name="get_ldap_entry", methods={"GET"})
-     * 
+     *
      * @return JsonResponse Entry | LdapException
      */
     public function getLdapEntryByDn(
