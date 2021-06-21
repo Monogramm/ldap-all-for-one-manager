@@ -46,7 +46,7 @@ export const LdapEntryActionsDefault: ILdapEntryActions = {
       commit("GET_SUCCESS", response.data);
       return response.data;
     } catch (error) {
-      commit("GET_ERROR", error.response);
+      commit("GET_ERROR", error);
       return error;
     }
   },
@@ -61,7 +61,7 @@ export const LdapEntryActionsDefault: ILdapEntryActions = {
       commit("CREATE_SUCCESS", response.data);
       return response.data;
     } catch (error) {
-      commit("CREATE_ERROR", error.response);
+      commit("CREATE_ERROR", error);
       return error;
     }
   },
@@ -76,7 +76,7 @@ export const LdapEntryActionsDefault: ILdapEntryActions = {
       commit("EDIT_SUCCESS", response.data);
       return response.data;
     } catch (error) {
-      commit("EDIT_ERROR", error.response);
+      commit("EDIT_ERROR", error);
       return error;
     }
   },
@@ -91,7 +91,7 @@ export const LdapEntryActionsDefault: ILdapEntryActions = {
       commit("DELETE_SUCCESS", dn);
       return response.data;
     } catch (error) {
-      commit("DELETE_ERROR", error.response);
+      commit("DELETE_ERROR", error);
       return error;
     }
   },

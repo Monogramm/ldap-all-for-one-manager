@@ -84,6 +84,7 @@ export const LdapEntryMutationsDefault: ILdapEntryMutations = {
   CREATE_ERROR(state: ILdapEntryState, error?: AxiosError): void {
     state.isLoading = false;
     if (error && error.response) {
+      state.error.data = error.response.data;
       state.error.status = error.response.status;
       state.error.message = error.response.statusText;
     } else {
@@ -106,6 +107,7 @@ export const LdapEntryMutationsDefault: ILdapEntryMutations = {
   EDIT_ERROR(state: ILdapEntryState, error?: AxiosError): void {
     state.isLoading = false;
     if (error && error.response) {
+      state.error.data = error.response.data;
       state.error.status = error.response.status;
       state.error.message = error.response.statusText;
     } else {
@@ -132,7 +134,6 @@ export const LdapEntryMutationsDefault: ILdapEntryMutations = {
   },
   DELETE_ERROR(state: ILdapEntryState, response: any): void {
     state.isLoading = false;
-    state.error.status = response.status;
     if (response) {
       state.error.status = response.status;
     } else {

@@ -52,18 +52,24 @@ export default {
         .dispatch("ldapEntry/update", ldapEntry)
         .then(() => {
           if (!this.hasError) {
+            this.handleSucess();
             this.$router.replace({ name: "AdminLdapEntries" });
+          } else {
+            this.handleError(this.error)
           }
-        });
+        })
     },
     async createLdapEntry(ldapEntry: ILdapEntry) {
       await this.$store
         .dispatch("ldapEntry/create", ldapEntry)
         .then(() => {
           if (!this.hasError) {
+            this.handleSucess();
             this.$router.replace({ name: "AdminLdapEntries" });
+          } else {
+            this.handleError(this.error)
           }
-        });
+        })
     },
     onSubmit() {
       if (this.isEdit) {
@@ -71,6 +77,12 @@ export default {
       }
 
       return this.createLdapEntry(this.entry);
+    },
+    handleError(error: any) {
+      this.$buefy.snackbar.open(error.data);
+    },
+    handleSucess() {
+      this.$buefy.toast.open('Sucess');
     }
   }
 };
