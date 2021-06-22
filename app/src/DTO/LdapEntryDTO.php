@@ -12,16 +12,16 @@ class LdapEntryDTO
     /**
      * @var string the entry's DN.
      */
-    private $dn;
+    private $fullDn;
     /**
      * @var array the entry's complete list of attributes.
      */
     private $attributes;
 
 
-    public function __construct(string $dn, array $attributes = [])
+    public function __construct(string $fullDn, array $attributes = [])
     {
-        $this->dn = $dn;
+        $this->fullDn = $fullDn;
         $this->attributes = $attributes;
     }
 
@@ -32,7 +32,7 @@ class LdapEntryDTO
      */
     public function getDn()
     {
-        return $this->dn;
+        return $this->fullDn;
     }
 
     /**
@@ -42,7 +42,7 @@ class LdapEntryDTO
      */
     public function setDn($fullDn)
     {
-        $this->dn = $fullDn;
+        $this->fullDn = $fullDn;
     }
 
     /**

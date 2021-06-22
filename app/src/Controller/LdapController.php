@@ -63,10 +63,13 @@ class LdapController extends AbstractController
         $options['pageSize'] = $size;
         $options['maxItems'] = $max;
 
-        $ldap->bind();
-
-        //XXX Verify If there is a need to throw a special error by try catch
-        $ldapEntries = $ldap->search($query, $baseDn, $options);
+        try {
+            $ldap->bind();
+            $ldapEntries = $ldap->search($query, $baseDn, $options);
+        } catch (LdapException $exception) {
+            return new JsonResponse($exception->getMessage(), 500);
+        }
+        
         $total = count($ldapEntries);
         $entries = array();
 
@@ -101,11 +104,11 @@ class LdapController extends AbstractController
     ): JsonResponse {
 
         $query = $request->get('query', '(objectClass=*)');
-        // TODO Add attributes option.
+
         $options = $request->get('options', []);
 
-        $ldap->bind();
         try {
+            $ldap->bind();
             $ldapEntry = $ldap->get($query, $fullDN, $options);
         } catch (LdapException $exception) {
             return new JsonResponse($exception->getMessage(), 400);
@@ -130,6 +133,7 @@ class LdapController extends AbstractController
     ): JsonResponse {
 
         try {
+            // XXX Deserialize from base64 jpegPhoto.
             $dto = $serializer->deserialize(
                 $request->getContent(),
                 Entry::class,
@@ -139,17 +143,16 @@ class LdapController extends AbstractController
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
-        // TODO Deserialize from base64 jpegPhoto.
         try {
             $ldap->bind();
             $ldap->create($dto->getDn(), $dto->getAttributes());
-
-            return JsonResponse::fromJsonString(
-                $serializer->serialize($translator->trans('sucess.ldap'), 'json')
-            );
         } catch (LdapException $exception) {
             return new JsonResponse($exception->getMessage(), 500);
         }
+
+        return JsonResponse::fromJsonString(
+            $serializer->serialize($translator->trans('sucess.ldap'), 'json')
+        );
     }
 
     /**
@@ -167,6 +170,7 @@ class LdapController extends AbstractController
         $query = $request->get('query', '(objectClass=*)');
 
         try {
+            // XXX Deserialize from base64 jpegPhoto.
             $dto = $serializer->deserialize(
                 $request->getContent(),
                 Entry::class,
@@ -176,19 +180,16 @@ class LdapController extends AbstractController
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
-        // TODO Deserialize from base64 jpegPhoto.
-
         try {
             $ldap->bind();
             $ldap->update($fullDN, $query, $dto->getAttributes());
-
-            return JsonResponse::fromJsonString(
-                $serializer->serialize($translator->trans('sucess.ldap'), 'json')
-            );
         } catch (LdapException $exception) {
-            // TODO Log the exception.
             return new JsonResponse($exception->getMessage(), 500);
         }
+
+        return JsonResponse::fromJsonString(
+            $serializer->serialize($translator->trans('sucess.ldap'), 'json')
+        );
     }
 
     /**
