@@ -2,13 +2,28 @@
 
 namespace App\DTO;
 
-use RuntimeException;
 use Symfony\Component\Ldap\Entry;
 
+/**
+ * LDAP Entry Data Transfer Object used for serialization (API, CLI, ...).
+ */
 class LdapEntryDTO
 {
+    /**
+     * @var string the entry's DN.
+     */
     private $dn;
+    /**
+     * @var array the entry's complete list of attributes.
+     */
     private $attributes;
+
+
+    public function __construct(string $dn, array $attributes = [])
+    {
+        $this->dn = $dn;
+        $this->attributes = $attributes;
+    }
 
     /**
      * Returns the entry's DN.
@@ -18,6 +33,36 @@ class LdapEntryDTO
     public function getDn()
     {
         return $this->dn;
+    }
+
+    /**
+     * Sets the entry's DN.
+     *
+     * @param string $fullDn The entry's DN.
+     */
+    public function setDn($fullDn)
+    {
+        $this->dn = $fullDn;
+    }
+
+    /**
+     * Returns the complete list of attributes.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Sets the complete list of attributes.
+     *
+     * @param string $attributes The complete list of attributes.
+     */
+    public function setAttributes($attributes)
+    {
+        $this->attributes = $attributes;
     }
 
     /**
@@ -48,19 +93,9 @@ class LdapEntryDTO
     }
 
     /**
-     * Returns the complete list of attributes.
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
      * Sets a value for the given attribute.
      *
-     * @param string $name
+     * @param string $name attribute name.
      */
     public function setAttribute($name, array $value)
     {
@@ -70,7 +105,7 @@ class LdapEntryDTO
     /**
      * Removes a given attribute.
      *
-     * @param string $name
+     * @param string $name attribute name.
      */
     public function removeAttribute($name)
     {
@@ -78,69 +113,33 @@ class LdapEntryDTO
     }
 
     /**
-     * @param string $format
+     * @param string $format Serialization format. Can be either 'json' or 'ldif'.
      *
-     * @return string
+     * @return string Serialized LDAP entry.
      */
     public function serialize(string $format)
     {
-        return self::serializeEntry($this, $format);
+        return LdapEntrySerializer::serializeEntry($this, $format);
     }
 
     /**
-     * @param Entry|self $ldapEntry
-     * @param string $format
-     *
-     * @return string
+     * @return Entry Convert LDAP entry DTO into full fledged LDAP Entry.
      */
-    public static function serializeEntry($ldapEntry, string $format = 'json')
+    public function toEntry(): Entry
     {
-        $outputEntry = '';
-
-        switch ($format) {
-            case 'ldif':
-                $outputEntry = "\n";
-                $outputEntry .= 'dn: ' . $ldapEntry->getDn() . "\n";
-                foreach ($ldapEntry->getAttributes() as $key => $values) {
-                    if (empty($values) || ! is_array($values)) {
-                        continue;
-                    }
-                    foreach ($values as $value) {
-                        $outputEntry .= $key . ': ' . $value . "\n";
-                    }
-                }
-                break;
-
-            case 'json':
-                $outputEntry = json_encode($ldapEntry->getAttributes());
-                break;
-
-            default:
-                throw new RuntimeException('Unknown format: ' . $format);
-                break;
-        }
-
-        return $outputEntry;
+        return new Entry($this->dn, $this->attributes);
     }
 
     /**
-     * @param Entry|self $ldapEntry
-     * @param string $format
+     * @param Entry $entry LDAP Entry to convert into a LDAP entry DTO.
      *
-     * @return Entry
+     * @return LdapEntryDTO LDAP entry DTO.
      */
-    public static function serializeJpegPhoto($ldapEntry)
+    public static function fromEntry(Entry $entry): LdapEntryDTO
     {
-        // Serialize in base64 jpegPhoto.
-        if (!empty($ldapEntry->hasAttribute('jpegPhoto')) && !empty($ldapEntry->getAttribute('jpegPhoto'))) {
-            // Serialize in base64 jpegPhoto.
-            $jpegPhotos = array();
-            foreach ($ldapEntry->getAttribute('jpegPhoto') as $jpegPhoto) {
-                $jpegPhotos[] = base64_encode($jpegPhoto);
-            }
-            $ldapEntry->setAttribute('jpegPhoto', $jpegPhotos);
-        }
-
-        return $ldapEntry;
+        $entry = new LdapEntryDTO($entry->getDn(), $entry->getAttributes());
+        // Automatically convert binary fields into base64
+        LdapEntrySerializer::binaryToBase64($entry);
+        return $entry;
     }
 }

@@ -71,13 +71,10 @@ class LdapController extends AbstractController
         $entries = array();
 
         foreach ($ldapEntries as $key => $ldapEntry) {
-            $entries[$key]['dn'] = $ldapEntry->getDn();
+            $dto = LdapEntryDTO::fromEntry($ldapEntry);
 
-            //XXX Verify if there is a need to throw a special error by try catch
-            LdapEntryDTO::serializeJpegPhoto($ldapEntry);
-
-            // Rely on filter option to filter attributes
-            $entries[$key]['attributes'] = $ldapEntry->getAttributes();
+            $entries[$key]['dn'] = $dto->getDn();
+            $entries[$key]['attributes'] = $dto->getAttributes();
         }
 
         $entries = $serializer->normalize(
@@ -114,12 +111,10 @@ class LdapController extends AbstractController
             return new JsonResponse($exception->getMessage(), 400);
         }
 
-        //XXX Verify if there is a need to throw a special error by try catch
-        LdapEntryDTO::serializeJpegPhoto($ldapEntry);
+        $dto = LdapEntryDTO::fromEntry($ldapEntry);
+        $json = $serializer->serialize($dto, 'json');
 
-        $dto = $serializer->serialize($ldapEntry, 'json');
-
-        return JsonResponse::fromJsonString($dto);
+        return JsonResponse::fromJsonString($json);
     }
 
     /**
