@@ -6,8 +6,8 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * This will suppress all the PMD warnings in
- * this class.
+ * This will suppress all the TooManyPublicMethods 
+ * PMD warnings in this class.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
@@ -142,8 +142,8 @@ class LdapControllerTest extends AuthenticatedWebTestCase
 
         $this->client->request('POST', '/api/admin/ldap', [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals("true", $responseContent);
+        $responseContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertEquals('Sucess', $responseContent);
     }
 
     /**
@@ -164,11 +164,10 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     }
 
     /**
-     * Function test editLdapEntryByQuery normal use
+     * Function test editLdapEntry normal use
      */
     public function testEditLdapEntry()
     {
-
         $attr = '{
             "dn":"cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com",
             "attributes":{
@@ -180,12 +179,12 @@ class LdapControllerTest extends AuthenticatedWebTestCase
 
         $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", [], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals('"The op\u00e9ration is successful"', $responseContent);
+        $responseContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertEquals('Sucess', $responseContent);
     }
 
     /**
-     * Function test editLdapEntryByQuery using query
+     * Function test editLdapEntry using query
      */
     public function testEditLdapEntryByQuery()
     {
@@ -200,12 +199,12 @@ class LdapControllerTest extends AuthenticatedWebTestCase
 
         $this->client->request('PUT', "/api/admin/ldap/$this->fullDn", ['query'=>$this->query], [], [], $attr);
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals('"The op\u00e9ration is successful"', $responseContent);
+        $responseContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertEquals('Sucess', $responseContent);
     }
 
-        /**
-     * Function test editLdapEntryByQuery Entry to update don't exist
+    /**
+     * Function test editLdapEntry Entry to update don't exist
      */
     public function testEditLdapEntryNoEntry()
     {
@@ -221,7 +220,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
 
         $this->client->request('PUT', "/api/admin/ldap/$param", ['query'=> $this->query], [], [], $attr);
         $this->assertSame(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             $this->client->getResponse()->getStatusCode()
         );
     }
@@ -233,8 +232,8 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     {
         $this->client->request('DELETE', "/api/admin/ldap/$this->fullDn");
         $this->assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-        $responseContent = $this->client->getResponse()->getContent();
-        $this->assertEquals("true", $responseContent);
+        $responseContent = json_decode($this->client->getResponse()->getContent());
+        $this->assertEquals("Sucess", $responseContent);
     }
 
     /**
@@ -244,7 +243,7 @@ class LdapControllerTest extends AuthenticatedWebTestCase
     {
         $this->client->request('DELETE', '/api/admin/ldap/not-exist');
         $this->assertSame(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_INTERNAL_SERVER_ERROR,
             $this->client->getResponse()->getStatusCode()
         );
     }
