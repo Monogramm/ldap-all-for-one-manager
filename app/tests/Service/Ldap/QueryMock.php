@@ -101,9 +101,9 @@ class QueryMock extends AbstractQuery
                 if ($pageSize > 0 && $sizeLimit >= $pageSize) {
                     $sizeLimit = 0;
                 }
+
                 // TODO Define expected responses for tests
                 // TODO verify if $con and $sizeLimit is useful fot the test
-                // $search = $this->callSearchFunction($con, $func, $sizeLimit);
                 $search = $this->callSearchFunction($func, $this->dn);
 
                 if (false === $search) {
@@ -180,38 +180,46 @@ class QueryMock extends AbstractQuery
         // TODO Define expected responses for tests
         switch ($func) {
             case 'ldap_read':
-                # code...
                 $ret = array(
                         'dn'=>'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
                         'attributes'=> array(
                             'objectClass'=>['inetOrgPerson'],
                             'sn'=>['Conrad'],
                             'mail'=> ['hermes@planetexpress.com'],
-                            'uid'=>['hermes'],
-                            'method'=>['ldap_read']
+                            'uid'=>['hermes']
                         )
                     );
                 break;
 
             case 'ldap_list':
-                # code...
                 $ret = array(
                         array(
                             'dn'=>'uid=john.doe,ou=people,ou=example,ou=com',
                             'attributes'=> array(
-                                'method'=>['ldap_list']
+                                'sn'=>['doe']
                             )
                         )
                     );
                 break;
 
             case 'ldap_search':
-                # code...
                 $ret = array(
                     array(
                         'dn'=>'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com',
                         'attributes'=> array(
-                            'method'=>['ldap_search']
+                            'objectClass'=>['inetOrgPerson'],
+                            'sn'=>['Conrad'],
+                            'mail'=> ['hermes@planetexpress.com'],
+                            'uid'=>['hermes']
+                        )
+                    ),
+                    array(
+                        'dn'=>'cn=Philip J. Fry,ou=people,dc=planetexpress,dc=com',
+                        'attributes'=> array(
+                            'objectClass'=>['inetOrgPerson'],
+                            'sn'=>['Fry'],
+                            'mail'=> ['fry@planetexpress.com'],
+                            'uid'=>['fry']
                         )
                     )
                 );

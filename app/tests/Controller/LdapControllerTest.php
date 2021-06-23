@@ -6,7 +6,7 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * This will suppress all the TooManyPublicMethods 
+ * This will suppress all the TooManyPublicMethods
  * PMD warnings in this class.
  *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
