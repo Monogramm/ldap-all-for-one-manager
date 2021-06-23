@@ -1,6 +1,6 @@
 <!-- Component responsible for the creation of inputs-->
 <template>
-  <div class="">
+  <div>
     <template
       v-for="(row, index) in attributes"
     >
@@ -18,6 +18,7 @@
             v-model="attributes[index]"
             :value="row"
             type="text"
+            :title="$t('ldap.entries.new.value.value-title')"
             :placeholder="$t('ldap.entries.new.value.value-placeholder')"
           />
         </div>
@@ -30,6 +31,7 @@
             :key="`buttonRemoveValue:${index}`"
             type="is-danger"
             icon-right="trash"
+            :title="$t('ldap.entries.new.value.del-title')"
             @click="removeValue(index)"
           />
         </div>
@@ -42,6 +44,7 @@
       <div class="column is-2 pl-0">
         <b-button
           icon-right="plus"
+          :title="$t('ldap.entries.new.value.add-title')"
           @click="addValue()"
         />
       </div>

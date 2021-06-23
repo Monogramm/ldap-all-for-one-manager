@@ -251,16 +251,27 @@
       "list": "LDAP Entries List",
       "edit": "Edit LDAP Entry",
       "create": "Create LDAP Entry",
+      "search": "Search entry by DN",
       "dn": "Distinguished Name",
       "new": {
+        "dn": {
+          "title-input": "Distinguished Name name field",
+          "key-placeholder": "New Distinguished Name"
+        },
         "attribute": {
+            "title-input": "Attribute name field",
             "key-label": "New attribute name",
-            "key-placeholder": "Example: sn",
-            "add": "Add an attribute"
+            "key-placeholder": "New attribute name example: sn",
+            "add": "Add an attribute",
+            "del-title": "Remove an attribute"
         },
         "value": {
-            "value-placeholder": "LDAP attribute value"
-        }
+            "value-placeholder": "LDAP attribute value",
+            "value-title": "Value field for attribute",
+            "add-title": "Add a new attribute field",
+            "del-title": "Remove attribute field"
+        },
+        "save": "Send to the LDAP server"
       }
     }
   },

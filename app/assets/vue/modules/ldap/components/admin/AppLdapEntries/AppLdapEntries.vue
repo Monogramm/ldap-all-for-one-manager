@@ -8,6 +8,7 @@
       <b-button
         type="is-primary"
         class="field"
+        :title="$t('ldap.entries.create')"
         @click="create"
       >
         {{ $t("common.create") }}
@@ -47,12 +48,14 @@
           <div class="buttons">
             <b-button
               type="is-warning"
+              :title="$t('ldap.entries.edit')"
               @click="edit(props.row.dn)"
             >
               {{ $t("common.edit") }}
             </b-button>
             <b-button
               type="is-danger"
+              :title="$t('ldap.entries.delete')"
               @click="deleteLdapEntry(props.row.dn)"
             >
               {{ $t("common.delete") }}

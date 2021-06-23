@@ -5,6 +5,7 @@
     </h1>
 
     <form
+      role="form"
       class="box"
       @submit.prevent
     >
@@ -18,18 +19,21 @@
           </h1>
           <div v-else>
             <!-- Default DN input-->
-            <b-field :label="$t('ldap.entries.dn')">
+            <b-field
+              :label="$t('ldap.entries.dn')"
+            >
               <b-input
                 v-model="newEntry.dn"
                 maxlength="254"
                 required
+                :title="$t('ldap.entries.new.dn.title-input')"
+                :placeholder="$t('ldap.entries.new.dn.key-placeholder')"
                 :disabled="isLoading"
               />
             </b-field>
           </div>
         </div>
       </div>
-
       <!-- Call the AppLdapAttributes Component-->
       <app-ldap-attributes
         :values="newEntry.attributes"
@@ -37,10 +41,11 @@
       <div class="columns is-centered is-mobile mt-5">
         <!-- Button submit call onSubmit() from parent-->
         <b-button
-          type="is-primary"
-          native-type="submit"
           :disabled="ldapEntry.dn == '' || ldapEntry.dn == null "
           :loading="isLoading"
+          :title="$t('ldap.entries.new.save')"
+          type="is-primary"
+          native-type="submit"
           @click="submit"
         >
           {{ $t(isEdit ? 'common.edit' : 'common.create') }}

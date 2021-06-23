@@ -20,6 +20,7 @@
             <b-button
               type="is-danger"
               icon-right="trash"
+              :title="$t('ldap.entries.new.attribute.del-title')"
               @click="removeAttribute(index)"
             />
           </div>
@@ -39,12 +40,14 @@
         >
           <b-input
             v-model="newAttributeKey"
+            :title="$t('ldap.entries.new.attribute.title-input')"
             :placeholder="$t('ldap.entries.new.attribute.key-placeholder')"
             type="text"
           />
         </b-field>
 
         <b-button
+          :title="$t('ldap.entries.new.attribute.add')"
           @click="addAttribute()"
         >
           {{ $t('ldap.entries.new.attribute.add') }}

@@ -251,16 +251,28 @@
       "list": "Liste des entrées LDAP",
       "edit": "Modification d'une entrée LDAP",
       "create": "Création d'une entrée LDAP",
+      "delete": "Supprimer une entrée LDAP",
+      "search": "Rechercher une entrée par son DN",
       "dn": "Nom distinctif",
       "new": {
+        "dn": {
+          "title-input": "Champ du Nom distinctif",
+          "key-placeholder": "Nouveaux Nom distinctif"
+        },
         "attribute": {
+            "title-input": "Champ du nom de l'attribut",
             "key-label": "Nom du nouvel attribut",
-            "key-placeholder": "Exemple : sn",
-            "add": "Ajouter un attribut"
+            "key-placeholder": "Nom du nouvel attribut exemple : sn",
+            "add": "Ajouter un attribut",
+            "del-title": "Supprimer un attribut"
         },
         "value": {
-            "value-placeholder": "Valeur de l'attribut LDAP"
-        }
+            "value-placeholder": "Valeur de l'attribut LDAP",
+            "value-title": "Champ de valeur pour l'attribut",
+            "add-title": "Ajouter un nouveaux champ d'attribut",
+            "del-title": "Supprimer champ d'attribut"
+        },
+        "save": "Envoyer au serveur LDAP"
       }
     }
   },
