@@ -14,28 +14,33 @@
           class="column is-three-fifths is-offset-one-fifth"
         >
           <!-- Display current image -->
-          <b-image
-            v-if="type === 'image'"
-            :src="formattedValue(index)"
-          />
-          <b-field>
-            <b-upload
-              drag-drop
-              @input="droppedFile($event, index)"
-            >
-              <section class="section">
-                <div class="content has-text-centered">
-                  <p>
-                    <b-icon
-                      icon="upload"
-                      size="is-large"
-                    />
-                  </p>
-                  <p>Drop your file here or click to upload</p>
-                </div>
-              </section>
-            </b-upload>
-          </b-field>
+          <figure class="image is-16by9">
+            <b-image
+              v-if="type === 'image'"
+              class="has-ratio"
+              :src="formattedValue(index)"
+            />
+          </figure>
+          <div class="mt-4 columns mt-1 is-centered">
+            <b-field>
+              <b-upload
+                drag-drop
+                @input="droppedFile($event, index)"
+              >
+                <section class="section">
+                  <div class="content has-text-centered">
+                    <p>
+                      <b-icon
+                        icon="upload"
+                        size="is-large"
+                      />
+                    </p>
+                    <p>Drop your file here or click to upload</p>
+                  </div>
+                </section>
+              </b-upload>
+            </b-field>
+          </div>
         </div>
         <div
           v-else
