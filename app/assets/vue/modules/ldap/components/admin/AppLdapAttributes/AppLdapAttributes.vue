@@ -29,6 +29,7 @@
         <app-ldap-attribute
           :key="`componentLdapattribute:${index}`"
           :value="row"
+          :type="getAttributeType(index)"
         />
       </div>
     </template>
@@ -86,6 +87,29 @@ export default {
     },
     removeAttribute(index: string) {
       this.$delete(this.attributes, index);
+    },
+    getAttributeType(key: string) {
+      if (!!!key) {
+        return null;
+      }
+
+      let type;
+      const lowerKey = key.toLowerCase();
+      switch (lowerKey) {
+      case 'jpegphoto':
+        type = 'image';
+        break;
+
+      case 'userpassword':
+        type = 'password';
+        break;
+
+      default:
+        type = 'text';
+        break;
+      }
+
+      return type;
     },
   }
 };
