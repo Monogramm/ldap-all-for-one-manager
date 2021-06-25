@@ -48,7 +48,7 @@
           native-type="submit"
           @click="submit"
         >
-          {{ $t(isEdit ? 'common.edit' : 'common.create') }}
+          {{ $t(isEdit ? 'common.update' : 'common.create') }}
         </b-button>
       </div>
     </form>
