@@ -14,10 +14,11 @@
           class="column is-three-fifths is-offset-one-fifth"
         >
           <!-- Display current image -->
-          <figure class="image is-16by9">
+          <figure
+            v-if="type === 'image'"
+            class="image"
+          >
             <b-image
-              v-if="type === 'image'"
-              class="has-ratio"
               :src="formattedValue(index)"
             />
           </figure>
@@ -126,16 +127,14 @@ export default {
 
       await this.toBase64(file,
         (reader: FileReader, result: string | ArrayBuffer) => {
-
           if(typeof(result)=="string") {
-            if (result.startsWith('data:image/')) {
+            if (result.startsWith('data:')) {
               result = result.substring(result.indexOf(',')+1);
             }
           }
 
           // Save base64 into attribute values
           this.$set(this.values, index, result);
-          // FIXME UI not updated unless value added/removed
         },
         (reader: FileReader, ev: ProgressEvent<FileReader>) => {
           // TODO Display error toast
@@ -158,9 +157,8 @@ export default {
 
       switch (this.type) {
       case 'image':
-
         formattedValue = this.values[index];
-        if (! formattedValue.startsWith('data:image/png;base64,')) {
+        if (! formattedValue.startsWith('data:')) {
           formattedValue = 'data:image/png;base64,' + formattedValue;
         }
         break;
