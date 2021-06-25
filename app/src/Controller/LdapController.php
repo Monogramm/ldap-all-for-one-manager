@@ -176,6 +176,12 @@ class LdapController extends AbstractController
                 Entry::class,
                 'json'
             );
+
+            if($dto->hasAttribute('jpegPhoto'))
+            {
+                $dto->setAttribute('jpegPhoto',[base64_decode($dto->getAttribute('jpegPhoto')[0])]);
+            }
+
         } catch (NotEncodableValueException $exception) {
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
