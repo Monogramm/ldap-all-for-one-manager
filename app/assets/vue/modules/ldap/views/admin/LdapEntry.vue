@@ -79,6 +79,9 @@ export default {
       return this.createLdapEntry(this.entry);
     },
     handleError(error: any) {
+      // TODO if possible, set error type
+      // TODO make the snackbar stay on screen until clicked so user can read error!!
+      // TODO make the snackbar use the bulma error class
       this.$buefy.snackbar.open(error.data);
     },
     handleSucess() {
