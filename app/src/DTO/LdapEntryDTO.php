@@ -12,16 +12,16 @@ class LdapEntryDTO
     /**
      * @var string the entry's DN.
      */
-    private $fullDn;
+    private $dn;
     /**
      * @var array the entry's complete list of attributes.
      */
     private $attributes;
 
 
-    public function __construct(string $fullDn, array $attributes = [])
+    public function __construct(string $dn = null, array $attributes = [])
     {
-        $this->fullDn = $fullDn;
+        $this->dn = $dn;
         $this->attributes = $attributes;
     }
 
@@ -32,17 +32,17 @@ class LdapEntryDTO
      */
     public function getDn()
     {
-        return $this->fullDn;
+        return $this->dn;
     }
 
     /**
      * Sets the entry's DN.
      *
-     * @param string $fullDn The entry's DN.
+     * @param string $dn The entry's DN.
      */
-    public function setDn($fullDn)
+    public function setDn($dn)
     {
-        $this->fullDn = $fullDn;
+        $this->dn = $dn;
     }
 
     /**
@@ -127,7 +127,10 @@ class LdapEntryDTO
      */
     public function toEntry(): Entry
     {
-        return new Entry($this->dn, $this->attributes);
+        $entry = new Entry($this->dn, $this->attributes);
+        // Automatically decode all base64 fields
+        LdapEntrySerializer::fromBase64($entry);
+        return $entry;
     }
 
     /**

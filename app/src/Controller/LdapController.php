@@ -133,19 +133,19 @@ class LdapController extends AbstractController
     ): JsonResponse {
 
         try {
-            // XXX Deserialize from base64 jpegPhoto.
             $dto = $serializer->deserialize(
                 $request->getContent(),
-                Entry::class,
+                LdapEntryDTO::class,
                 'json'
             );
         } catch (NotEncodableValueException $exception) {
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
+        $entry = $dto->toEntry();
         try {
             $ldap->bind();
-            $ldap->create($dto->getDn(), $dto->getAttributes());
+            $ldap->create($entry->getDn(), $entry->getAttributes());
         } catch (LdapException $exception) {
             return new JsonResponse($exception->getMessage(), 500);
         }
@@ -170,25 +170,20 @@ class LdapController extends AbstractController
         $query = $request->get('query', '(objectClass=*)');
 
         try {
-            // XXX Deserialize from base64 jpegPhoto.
             $dto = $serializer->deserialize(
                 $request->getContent(),
-                Entry::class,
+                LdapEntryDTO::class,
                 'json'
             );
-
-            if($dto->hasAttribute('jpegPhoto'))
-            {
-                $dto->setAttribute('jpegPhoto',[base64_decode($dto->getAttribute('jpegPhoto')[0])]);
-            }
 
         } catch (NotEncodableValueException $exception) {
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
 
+        $entry = $dto->toEntry();
         try {
             $ldap->bind();
-            $ldap->update($fullDN, $query, $dto->getAttributes());
+            $ldap->update($fullDN, $query, $entry->getAttributes());
         } catch (LdapException $exception) {
             return new JsonResponse($exception->getMessage(), 500);
         }

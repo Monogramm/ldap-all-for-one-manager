@@ -120,4 +120,53 @@ class LdapEntrySerializer
 
         return $ldapEntry;
     }
+
+    /**
+     * Convert all base64 fields from an LDAP entry into original value.
+     *
+     * @param Entry|self $ldapEntry Ldap entry or LDAP entry DTO.
+     *
+     * @return Entry|self
+     */
+    public static function fromBase64($ldapEntry)
+    {
+        foreach ($ldapEntry->getAttributes() as $key => $values) {
+            $lowerKey = strtolower($key);
+
+            // TODO Check if value is a base64 (use regexp)
+            switch ($lowerKey) {
+                case 'jpegphoto':
+                    // Deserialize base64.
+                    self::decodeFromBase64($ldapEntry, $key, $values);
+                    break;
+
+                default:
+                    # Nothing to do
+                    break;
+            }
+        }
+
+        return $ldapEntry;
+    }
+
+    /**
+     * @param Entry|self $ldapEntry Ldap entry or LDAP entry DTO.
+     * @param string $key LDAP attribute key.
+     * @param mixed $values LDAP attribute values to convert.
+     *
+     * @return Entry|self the LDAP Entry whose binary field was decoded from base64.
+     */
+    private static function decodeFromBase64($ldapEntry, $key, $values)
+    {
+        if (!empty($values)) {
+            // Serialize binary values in base64.
+            $base64 = array();
+            foreach ($values as $value) {
+                $base64[] = base64_decode($value);
+            }
+            $ldapEntry->setAttribute($key, $base64);
+        }
+
+        return $ldapEntry;
+    }
 }
