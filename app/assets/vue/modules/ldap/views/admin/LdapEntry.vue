@@ -21,6 +21,10 @@ export default {
     dn: {
       type: String,
       default: ""
+    },
+    clone: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -32,7 +36,7 @@ export default {
     // TODO Add types to ldapEntry getters
     ...mapGetters("ldapEntry", ["isLoading", "item", "hasError", "error"]),
     isEdit() {
-      return !!this.dn;
+      return !!this.dn && !this.clone;
     }
   },
   async created() {

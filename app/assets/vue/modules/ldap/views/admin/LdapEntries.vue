@@ -1,16 +1,34 @@
 <template>
-  <app-ldap-entries
-    :is-loading="isLoading"
-    :ldap-entries="items"
-    :per-page="pagination.size"
-    :total="total"
-    @create="onCreate"
-    @edit="onEdit"
-    @delete="onDelete"
-    @pageChanged="onPageChange"
-    @filtersChanged="onFiltersChange"
-    @sortingChanged="onSortingChange"
-  />
+  <section class="section">
+    <h1 class="title is-1">
+      {{ $t("ldap.entries.list") }}
+    </h1>
+
+    <div class="box">
+      <b-button
+        type="is-primary"
+        class="field"
+        icon-left="plus"
+        :title="$t('ldap.entries.create')"
+        @click="onCreate"
+      >
+        {{ $t("common.create") }}
+      </b-button>
+
+      <app-ldap-entries
+        :is-loading="isLoading"
+        :ldap-entries="items"
+        :per-page="pagination.size"
+        :total="total"
+        @edit="onEdit"
+        @clone="onClone"
+        @delete="onDelete"
+        @pageChanged="onPageChange"
+        @filtersChanged="onFiltersChange"
+        @sortingChanged="onSortingChange"
+      />
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -60,6 +78,9 @@ export default {
     },
     onEdit(paramId: string) {
       this.$router.push({ name: "LdapEntryEdit", params: { dn: paramId } });
+    },
+    onClone(paramId: string) {
+      this.$router.push({ name: "LdapEntryClone", params: { dn: paramId } });
     },
     onCreate() {
       this.$router.push({ name: "LdapEntryCreate" });

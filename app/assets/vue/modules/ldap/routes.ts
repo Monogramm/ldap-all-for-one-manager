@@ -30,6 +30,16 @@ export const LdapEntryRoutes: RouteConfig[] = [
     props: (route) => ({ dn: route.params.dn }),
   },
   {
+    name: "LdapEntryClone",
+    path: "/admin/ldap-entry/:dn/clone",
+    component: AdminLdapEntry,
+    meta: {
+      requiresAuth: true,
+      requiresAdmin: true,
+    },
+    props: (route) => ({ dn: route.params.dn, clone: true }),
+  },
+  {
     name: "LdapEntryCreate",
     path: "/admin/ldap-entry",
     component: AdminLdapEntry,

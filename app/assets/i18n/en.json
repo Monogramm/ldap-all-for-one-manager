@@ -34,6 +34,7 @@
     "declare": "Declare",
     "create": "Create",
     "edit": "Edit",
+    "clone": "Clone",
     "update": "Update",
     "delete": "Delete",
     "manage": "Manage",
@@ -250,7 +251,9 @@
       "admin": "LDAP Entries",
       "list": "LDAP Entries List",
       "edit": "Edit LDAP Entry",
+      "clone": "Clone LDAP Entry",
       "create": "Create LDAP Entry",
+      "delete": "Delete LDAP Entry",
       "search": "Search entry by DN",
       "dn": "Distinguished Name",
       "new": {
