@@ -175,7 +175,6 @@ class LdapController extends AbstractController
                 LdapEntryDTO::class,
                 'json'
             );
-
         } catch (NotEncodableValueException $exception) {
             return new JsonResponse($translator->trans('error.ldap.deserialize'), 400);
         }
