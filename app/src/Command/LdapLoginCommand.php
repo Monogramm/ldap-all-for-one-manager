@@ -90,6 +90,7 @@ class LdapLoginCommand extends Command
         try {
             $entry = $ldapClient->check($username, $password);
         } catch (\Throwable $e) {
+            $this->logger->error($e);
             $io->error('Failed to check against LDAP. Error message: '.$e->getMessage());
             return 1;
         }

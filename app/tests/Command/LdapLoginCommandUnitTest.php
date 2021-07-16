@@ -37,14 +37,15 @@ class LdapLoginCommandUnitTest extends AbstractUnitTestLdap
         $this->ldapConnectionMock->expects($this->exactly(0))
             ->method('isBound')
             ->willReturn(true);
-            $this->ldapConnectionMock->expects($this->once())
+
+        $this->ldapConnectionMock->expects($this->any())
             ->method('bind');
 
-        $this->ldapAdapterMock->expects($this->once())
+        $this->ldapAdapterMock->expects($this->any())
             ->method('getConnection')
             ->willReturn($this->ldapConnectionMock);
 
-        $this->ldapAdapterMock->expects($this->once())
+        $this->ldapAdapterMock->expects($this->any())
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
 
@@ -82,6 +83,7 @@ class LdapLoginCommandUnitTest extends AbstractUnitTestLdap
         ]);
 
         $code = $commandTester->getStatusCode();
+
         $this->assertEquals(0, $code);
     }
 }

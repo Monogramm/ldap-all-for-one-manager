@@ -11,6 +11,7 @@ import { ParameterModule } from "../modules/parameter/module";
 import { BackgroundJobModule } from "../modules/backgroundJob/module";
 import { CurrencyModule } from "../modules/currency/module";
 import { MediaModule } from "../modules/media/module";
+import { LdapEntryModule } from "../modules/ldap/module";
 
 Vue.use(Vuex);
 
@@ -25,6 +26,7 @@ export const store: Store<IRootState> = new Vuex.Store({
     backgroundJob: BackgroundJobModule,
     currency: CurrencyModule,
     media: MediaModule,
+    ldapEntry: LdapEntryModule,
   },
 });
 

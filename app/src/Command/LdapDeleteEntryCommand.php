@@ -55,6 +55,7 @@ class LdapDeleteEntryCommand extends Command
         $config = $this->returnConfig($input);
 
         $ldapClient = new Client($this->ldap, $config);
+        $ldapClient->bind();
 
         if ($ldapClient->delete($fullDn)) {
             $symfonyStyle->success("Following LDAP entry was successfully deleted: $fullDn");

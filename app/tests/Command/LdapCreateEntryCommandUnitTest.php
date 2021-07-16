@@ -8,6 +8,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Ldap\Exception\LdapException;
 
 class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
 {
@@ -65,9 +66,6 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $this->assertEquals(0, $code);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testExecuteWithoutAttribute()
     {
         $this->buildLdapMock();
@@ -212,7 +210,7 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
 
         $this->ldapEntryManagerMock->expects($this->any())
             ->method('add')
-            ->willReturn(false);
+            ->will($this->throwException(new LdapException));
 
         $ldap = new Ldap($this->ldapAdapterMock);
 
@@ -226,16 +224,14 @@ class LdapCreateEntryCommandUnitTest extends AbstractUnitTestLdap
         $application = new Application();
         $application->add($cmd);
 
+        $this->expectException(LdapException::class);
+
         $command = $application->find('app:ldap:create-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
             'dn' => $this->dnWrong,
             'attr' => $this->attribute
         ]);
-
-        // the output of the command in the console
-        $code = $commandTester->getStatusCode();
-        $this->assertEquals(1, $code);
     }
 
     public function testExecuteBadDnAndAttributeFormat()

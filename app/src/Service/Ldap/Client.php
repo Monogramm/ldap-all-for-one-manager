@@ -1,10 +1,13 @@
 <?php
 
-
 namespace App\Service\Ldap;
 
+use Symfony\Component\Ldap\Adapter\CollectionInterface;
+use Symfony\Component\Ldap\Adapter\ExtLdap\EntryManager;
+use Symfony\Component\Ldap\Adapter\QueryInterface;
 use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Exception\LdapException;
+use Symfony\Component\Ldap\Exception\ConnectionException;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\LdapInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
@@ -61,53 +64,81 @@ class Client
         );
 
         if ($this->config['search_dn']) {
-            $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-            $result = $this->ldap->query($this->config['base_dn'], $query)->execute();
-            if (1 !== $result->count()) {
+            // Login with default credentials and search user
+            $this->bind();
+            $results = $this->search($query);
+
+            if (1 !== count($results)) {
                 throw new BadCredentialsException('The presented username is invalid.');
             }
 
-            $fullDn = $result[0]->getDn();
+            $fullDn = $results[0]->getDn();
         } else {
+            // Build full DN based on user ID and LDAP config
             $username = $this->ldap->escape($login, '', LdapInterface::ESCAPE_DN);
             $fullDn = sprintf('%s=%s,%s', $this->config['uid_key'], $username, $this->config['base_dn']);
         }
 
-        $this->ldap->bind($fullDn, $password);
-        $result = $this->ldap->query($fullDn, $query)->execute()[0];
+        $this->bind($fullDn, $password);
+
+        $results = $this->executeQuery($query, $fullDn);
+
+        $result = $results[0];
 
         return $result;
     }
 
     /**
-     * @return Entry[]|\Symfony\Component\Ldap\Adapter\CollectionInterface
+     * Open a connection bound to the LDAP.
      *
-     * @throws LdapException When option given doesn't match a ldap entry
+     * If no username / password is given, bind will be done with default search
+     * credentials from LDAP configuration.
      *
-     * @psalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @param string $username A LDAP dn
+     * @param string $password A password
+     *
+     * @throws ConnectionException if username / password could not be bound
+     *
+     * @return void
      */
-    public function executeQuery(string $query)
+    public function bind($username = null, $password = null): void
     {
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-        return $this->ldap->query($this->config['base_dn'], $query)->execute();
+        if (empty($username) && empty($password)) {
+            $username = $this->config['search_dn'];
+            $password = $this->config['search_password'];
+        }
+
+        $this->ldap->bind($username, $password);
     }
-    
+
     /**
-     * @return bool
+     * @return Entry[]|CollectionInterface
+     *
+     * @throws LdapException When option given doesn't match a LDAP entry
+     *
+     * @$ldappsalm-return CollectionInterface|array<array-key, Entry>
+     */
+    private function executeQuery(string $query, string $baseDn = null, array $options = [])
+    {
+        if (empty($baseDn)) {
+            $baseDn = $this->config['base_dn'];
+        }
+
+        return $this->ldap->query($baseDn, $query, $options)->execute();
+    }
+
+    /**
+     * @return String|bool
      *
      * @throws LdapException When the query given was not right
      */
     public function create(string $fullDn, array $attributes): bool
     {
-        // TODO Do not bind inside search (must be done before)
         $entryManager = $this->ldap->getEntryManager();
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
-
         $entry = new Entry($fullDn, $attributes);
-        if (!empty($entryManager->add($entry))) {
-            return true;
-        }
-        return false;
+
+        // XXX Check if its possible to return the saved LDAP entry.
+        return !empty($entryManager->add($entry));
     }
 
     /**
@@ -115,56 +146,97 @@ class Client
      *
      * @throws LdapException
      */
-    public function update(string $query, array $attributes) : bool
+    public function update(string $fullDn, string $query, array $attributes = []) : bool
     {
-        $entryManager = $this->ldap->getEntryManager();
-
         // Finding and updating an existing entry
-        $result = $this->executeQuery($query);
-
-        // FIXME Check result before doing anything on it
-        $entry = $result[0];
+        $entryManager = $this->ldap->getEntryManager();
+        $entry = $this->get($query, $fullDn);
 
         if (empty($entry)) {
             return false;
         }
-        
+
         foreach ($attributes as $key => $value) {
             $entry->setAttribute($key, $value);
         }
+        // XXX Check if it's possible to return the saved LDAP entry.
         $entryManager->update($entry);
 
         return true;
     }
 
     /**
+     * Delete an entry from a directory.
+     *
      * @return bool
      *
      * @throws LdapException
      */
     public function delete(string $fullDn)
     {
-        $this->ldap->bind($this->config['search_dn'], $this->config['search_password']);
+        // Removing an existing entry
         $entryManager = $this->ldap->getEntryManager();
         $entryManager->remove(new Entry($fullDn));
-        // Removing an existing entry
+
         return true;
     }
 
     /**
-     * @var string
+     * Search LDAP tree.
      *
-     * @return Entry[]|\Symfony\Component\Ldap\Adapter\CollectionInterface
+     * @return Entry[]|CollectionInterface
      *
      * @throws LdapException
      *
-     * @psalm-return \Symfony\Component\Ldap\Adapter\CollectionInterface|array<array-key, Entry>
+     * @psalm-return CollectionInterface|array<array-key, Entry>
      */
-    public function search(string $query)
+    public function search(
+        string $query,
+        string $baseDn = null,
+        array $options = ['scope' => QueryInterface::SCOPE_SUB]
+    ) {
+        $searchOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_SUB],
+            $options
+        );
+        return $this->executeQuery($query, $baseDn, $searchOptions);
+    }
+
+    /**
+     * Single-level search.
+     *
+     * @return Entry[]|CollectionInterface
+     *
+     * @throws LdapException
+     *
+     * @psalm-return CollectionInterface|array<array-key, Entry>
+     */
+    public function list(string $query, string $baseDn = null, array $options = [])
     {
-        //Symfony base function for fetching ldap
-        // TODO Do not bind inside search (must be done before)
-        $entries = $this->executeQuery($query);
-        return $entries;
+        $listOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_ONE],
+            $options
+        );
+        return $this->executeQuery($query, $baseDn, $listOptions);
+    }
+
+    /**
+     * Read an entry.
+     *
+     * @return Entry
+     *
+     * @throws LdapException
+     *
+     * @psalm-return Entry
+     */
+    public function get(string $query, string $baseDn = null, array $options = [])
+    {
+        $getOptions = array_merge(
+            ['scope' => QueryInterface::SCOPE_BASE],
+            $options
+        );
+        $results = $this->executeQuery($query, $baseDn, $getOptions);
+
+        return !empty($results) && 1 === count($results) ? $results[0] : null;
     }
 }

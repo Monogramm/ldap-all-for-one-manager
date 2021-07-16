@@ -4,6 +4,8 @@ namespace App\Command;
 
 use App\Service\Ldap\Client;
 use App\Command\BuildLdapConfig;
+use RuntimeException;
+use Symfony\Component\Ldap\Entry;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -11,10 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use App\DTO\LdapEntryDTO;
 
-class LdapSearchEntryCommand extends Command
+class LdapGetEntryCommand extends Command
 {
-    protected static $defaultName = 'app:ldap:search-entries';
+    protected static $defaultName = 'app:ldap:get-entry';
 
     use BuildLdapConfig;
 
@@ -41,9 +44,9 @@ class LdapSearchEntryCommand extends Command
             ->setDescription('Search LDAP Entries')
             ->setHelp('Search LDAP entries using a query.')
             ->addArgument(
-                'base',
-                InputArgument::OPTIONAL,
-                'LDAP Base Search DN. Must be a valid LDAP DN. Example: ou=people,ou=example,ou=com'
+                'entry',
+                InputArgument::REQUIRED,
+                'LDAP Entry DN. Must be a valid LDAP DN. Example: uid=john.doe,ou=people,ou=example,ou=com'
             )
             ->addArgument(
                 'query',
@@ -55,13 +58,14 @@ class LdapSearchEntryCommand extends Command
                 'attr',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Attributes to retrieve. DN will always be displayed. Example: uid,sn,cn'
+                'Attributes to retrieve. Will retrieve all attributes if empty. Example: uid,sn,cn'
             )
             ->addOption(
-                'labels',
+                'format',
                 null,
-                InputOption::VALUE_OPTIONAL,
-                'Labels to show. Example: Unique ID,Last Name,Full Name'
+                InputOption::VALUE_REQUIRED,
+                'Output format. Valid formats are: json,ldif',
+                'json'
             );
         $this->configureLdapOptions($this);
     }
@@ -74,9 +78,8 @@ class LdapSearchEntryCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $symfonyStyle = new SymfonyStyle($input, $output);
-        $symfonyStyle->comment("List of entries:");
 
-        $baseDn = $input->getArgument('base');
+        $entry = $input->getArgument('entry');
         $query = $input->getArgument('query');
 
         // Attributes to retrieve from LDAP
@@ -86,13 +89,7 @@ class LdapSearchEntryCommand extends Command
         }
         $attributes = array_unique($attributes);
 
-        // Attributes' labels
-        $labels =  explode(',', $input->getOption('labels'));
-        if (count($labels) !== count($attributes) || empty($labels[0])) {
-            $labels = $attributes;
-        }
-        array_unshift($labels, 'dn');
-        $labels = array_unique($labels);
+        $format = $input->getOption('format');
 
         // Retrieve LDAP config from input or env var
         $config = $this->returnConfig($input);
@@ -103,21 +100,14 @@ class LdapSearchEntryCommand extends Command
         // Search LDAP entries (with forced filtering of attributes)
         $options = [];
         $options['filter'] = $attributes;
-        array_unshift($options['filter'], 'dn');
-        $ldapEntries = $ldapClient->search($query, $baseDn, $options);
+        //array_unshift($options['filter'], 'dn');
+        $ldapEntry = $ldapClient->get($query, $entry, $options);
 
-        foreach ($ldapEntries as $key => $entry) {
-            $entries[$key]['dn'] = $entry->getDn();
+        if (! empty($ldapEntry)) {
+            $dto = LdapEntryDTO::fromEntry($ldapEntry);
+            $outputEntry = $dto->serialize($format);
 
-            foreach ($attributes as $attr) {
-                $entries[$key][$attr] = ($entry->hasAttribute($attr) && !empty($entry->getAttribute($attr))) ?
-                    json_encode($entry->getAttribute($attr)) : null;
-            }
-        }
-
-        if (isset($entries)) {
-            (new SymfonyStyle($input, $output))
-                ->table($labels, $entries);
+            $symfonyStyle->text($outputEntry);
 
             return 0;
         }

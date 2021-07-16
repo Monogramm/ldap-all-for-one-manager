@@ -14,8 +14,9 @@ use Symfony\Component\Console\Exception\RuntimeException;
 class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
 {
 
-    public $query = '(cn=Hermes Conrad)';
-    public $attribute = '{"description":["Decapodian"]}';
+    public $fullDn = 'cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com';
+    public $query = '(objectClass=inetOrgPerson)';
+    public $attribute = '{"description":["Jamaican"]}';
 
     public function testExecute()
     {
@@ -79,8 +80,9 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
         $command = $application->find('app:ldap:update-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            'query' => $this->query,
-            'attr' => $this->attribute
+            'dn' => $this->fullDn,
+            'attr' => $this->attribute,
+            'query' => $this->query
         ]);
 
         // the output of the command in the console
@@ -132,8 +134,9 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
         $command = $application->find('app:ldap:update-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
-            'query' => '',
-            'attr' => $this->attribute
+            'dn' => $this->fullDn,
+            'attr' => $this->attribute,
+            'query' => ''
         ]);
     }
 
@@ -177,6 +180,7 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
         $command = $application->find('app:ldap:update-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
+            'dn' => $this->fullDn,
             'query' => $this->query,
         ]);
     }
@@ -189,18 +193,38 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
             ->method('isBound')
             ->willReturn(true);
 
-        $this->ldapConnectionMock->expects($this->never())
+        $this->ldapQueryMock->expects($this->any())
+            ->method('execute')
+            ->willReturn([
+                new Entry(
+                    "dn=cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com",
+                    [
+                        'objectClass' => ['inetOrgPerson'],
+                        'cn' => ['Hermes Conrad'],
+                        'sn' => ['Conrad'],
+                        'description' => ['Human'],
+                        'employeeType' => ['Bureaucrat', 'Accountant'],
+                        'givenName' => ['Hermes'],
+                        'mail' => ['hermes@planetexpress.com'],
+                        'ou' => ['Office Management'],
+                        'uid' => ['hermes'],
+                        'userPassword' => ['hermes']
+                    ]
+                )
+            ]);
+
+        $this->ldapConnectionMock->expects($this->once())
             ->method('bind');
 
-        $this->ldapAdapterMock->expects($this->never())
+        $this->ldapAdapterMock->expects($this->once())
             ->method('getConnection')
             ->willReturn($this->ldapConnectionMock);
 
-        $this->ldapAdapterMock->expects($this->never())
+        $this->ldapAdapterMock->expects($this->once())
             ->method('getEntryManager')
             ->willReturn($this->ldapEntryManagerMock);
 
-        $this->ldapAdapterMock->expects($this->never())
+        $this->ldapAdapterMock->expects($this->once())
             ->method('createQuery')
             ->willReturn($this->ldapQueryMock);
 
@@ -216,13 +240,15 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
         $application = new Application();
         $application->add($cmd);
 
-        $this->expectException(RuntimeException::class);
-
         $command = $application->find('app:ldap:update-entry');
         $commandTester = new CommandTester($command);
         $commandTester->execute([
+            'dn' => $this->fullDn,
             'attr' => $this->attribute
         ]);
+
+        $code = $commandTester->getStatusCode();
+        $this->assertEquals(0, $code);
     }
 
     public function testExecuteWithoutQueryAndAttribute()
@@ -264,6 +290,53 @@ class LdapUpdateEntryCommandUnitTest extends AbstractUnitTestLdap
 
         $command = $application->find('app:ldap:update-entry');
         $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
+        $commandTester->execute([
+            'dn' => $this->fullDn
+        ]);
+    }
+
+    public function testExecuteWithoutDn()
+    {
+        $this->buildLdapMock();
+
+        $this->ldapConnectionMock->expects($this->exactly(0))
+            ->method('isBound')
+            ->willReturn(true);
+
+        $this->ldapConnectionMock->expects($this->never())
+            ->method('bind');
+
+        $this->ldapAdapterMock->expects($this->never())
+            ->method('getConnection')
+            ->willReturn($this->ldapConnectionMock);
+
+        $this->ldapAdapterMock->expects($this->never())
+            ->method('getEntryManager')
+            ->willReturn($this->ldapEntryManagerMock);
+
+        $this->ldapAdapterMock->expects($this->never())
+            ->method('createQuery')
+            ->willReturn($this->ldapQueryMock);
+
+        $ldap = new Ldap($this->ldapAdapterMock);
+
+        $cmd = new LdapUpdateEntryCommand(
+            $ldap
+        );
+
+        $kernel = static::createKernel();
+        $kernel->boot();
+
+        $application = new Application();
+        $application->add($cmd);
+
+        $this->expectException(RuntimeException::class);
+
+        $command = $application->find('app:ldap:update-entry');
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([
+            'attr' => $this->attribute,
+            'query' => $this->query
+        ]);
     }
 }

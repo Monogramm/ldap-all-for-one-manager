@@ -74,6 +74,14 @@
                 <source>error.common.invalid.json</source>
                 <target>Invalid JSON</target>
             </trans-unit>
+            <trans-unit id="sucess_ldap">
+                <source>sucess.ldap</source>
+                <target>Sucess</target>
+            </trans-unit>
+            <trans-unit id="error_ldap_deserialize">
+                <source>error.ldap.deserialize</source>
+                <target>The LDAP entry it's not in a good format</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

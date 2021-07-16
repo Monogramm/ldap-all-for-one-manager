@@ -111,6 +111,8 @@ import {
   faCaretUp,
   faUser,
   faMagic,
+  faEdit,
+  faCopy,
   faFilter,
   faSignInAlt,
   faSignOutAlt,
@@ -124,6 +126,8 @@ import {
   faUsers,
   faCogs,
   faImages,
+  faTrash,
+  faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
@@ -156,6 +160,8 @@ library.add(
   faCaretUp,
   faUser,
   faMagic,
+  faEdit,
+  faCopy,
   faFilter,
   faSignInAlt,
   faSignOutAlt,
@@ -169,6 +175,8 @@ library.add(
   faUsers,
   faCogs,
   faImages,
+  faTrash,
+  faBook,
 );
 Vue.component("vue-fontawesome", FontAwesomeIcon);
 

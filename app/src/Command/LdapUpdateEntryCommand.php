@@ -40,13 +40,20 @@ class LdapUpdateEntryCommand extends Command
             ->setDescription('Update a LDAP Entry')
             ->setHelp('Update an existing LDAP entry using a DN and attributes.')
             ->addArgument(
-                'query',
+                'dn',
                 InputArgument::REQUIRED,
-                'LDAP Update query. Must be a valid LDAP search query. Example: (description=Human)'
-            )->addArgument(
+                'LDAP entry Distinguished Name'
+            )
+            ->addArgument(
                 'attr',
                 InputArgument::REQUIRED,
                 'LDAP entry attributes. Must be provided as a valid JSON string: {"uid":"john.doe","cn":"John DOE"}'
+            )
+            ->addArgument(
+                'query',
+                InputArgument::OPTIONAL,
+                'LDAP Update query. Must be a valid LDAP search query. Example: (description=Human)',
+                '(objectClass=*)'
             );
         $this->configureLdapOptions($this);
     }
@@ -58,8 +65,9 @@ class LdapUpdateEntryCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $fullDn = $input->getArgument('query');
+        $fullDn = $input->getArgument('dn');
         $attributes = $input->getArgument('attr');
+        $query = $input->getArgument('query');
         $symfonyStyle = new SymfonyStyle($input, $output);
 
         $symfonyStyle->comment("update entry :");
@@ -74,11 +82,13 @@ class LdapUpdateEntryCommand extends Command
         $config = $this->returnConfig($input);
 
         $ldapClient = new Client($this->ldap, $config);
+        $ldapClient->bind();
 
-        if ($ldapClient->update($fullDn, $jsonDecodeAttributes)) {
+        if ($ldapClient->update($fullDn, $query, $jsonDecodeAttributes)) {
             $symfonyStyle->success("Following LDAP entry was successfully updated: $fullDn");
             return 0;
         }
         $symfonyStyle->error("An error occurred during update of LDAP entry");
+        return 1;
     }
 }

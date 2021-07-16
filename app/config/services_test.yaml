@@ -7,3 +7,18 @@ services:
     # aliases are prefixed with test. For example:
     #
     # test.App\Service\MyService: '@App\Service\MyService'
+
+    # Allow mocks of LDAP service.
+    #Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+    #    public: true
+    #    shared: false
+
+    #test.Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+    #    alias: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
+    #    public: true
+
+    # Allow mocks of LDAP service.
+    App\Service\Ldap\Client:
+        public: true
+        class: App\Tests\Service\Ldap\ClientMock
+        #shared: false

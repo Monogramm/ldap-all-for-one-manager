@@ -21,6 +21,7 @@ import { ParameterRoutes } from "../modules/parameter/routes";
 import { BackgroundJobRoutes } from "../modules/backgroundJob/routes";
 import { CurrencyRoutes } from "../modules/currency/routes";
 import { MediaRoutes } from "../modules/media/routes";
+import { LdapEntryRoutes } from "../modules/ldap/routes";
 
 Vue.use(VueRouter);
 
@@ -88,6 +89,7 @@ export const router: VueRouter = new VueRouter({
     ...BackgroundJobRoutes,
     ...CurrencyRoutes,
     ...MediaRoutes,
+    ...LdapEntryRoutes,
   ],
 });
 
