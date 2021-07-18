@@ -162,7 +162,7 @@ RUN set -ex; \
     echo "${VERSION} ${VCS_REF} ${BUILD_DATE}" > '/usr/src/symfony/.docker/build'
 
 # Once application has been built, prepare production image
-FROM php:7.4-fpm
+FROM php:7.3.28-fpm
 
 # install the packages we need
 # install the PHP extensions we need
